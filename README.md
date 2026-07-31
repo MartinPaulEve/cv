@@ -1,7 +1,16 @@
 # cv
 
 This tool builds a PDF and an HTML CV from the metadata held about a scholar
-in an institutional repository (at present, an eprints repository).
+in institutional repositories. It can pull from an eprints repository and
+from any InvenioRDM repository (KC Works, Zenodo, and others), merging the
+results and deduplicating records that were deposited in more than one
+place (by DOI, with a title fallback for deposits that carry no DOI; the
+eprints record is preferred and its gaps are filled from the other copy).
+
+Both outputs are built for WCAG 2.2 AAA accessibility: semantic list
+structure, AAA contrast, accessible link names, and a tagged PDF with a
+document outline, produced fully headlessly. An axe-core gate
+(`npm run check-access`) verifies both generated documents.
 
 The project uses [uv](https://docs.astral.sh/uv/) for packaging and running.
 There is no separate installation step: `uv run` resolves and installs
