@@ -217,6 +217,16 @@ class TestSectionRendering:
         assert 'href="https://repo.example/1"' in section
 
 
+class TestConfigTransclusion:
+    def test_config_values_are_available_to_templates(self, processor):
+        """Templates may transclude configuration values, e.g. the user's
+        name in a title, via the {{config:variable}} syntax."""
+        template = "<title>{{config:user}}: Curriculum Vitae</title>"
+        assert processor._substitute_template(template, "html") == (
+            "<title>Jane Doe: Curriculum Vitae</title>"
+        )
+
+
 class TestTemplateLoading:
     def test_template_contents_returned(self, processor, tmp_path):
         template = tmp_path / "tpl"

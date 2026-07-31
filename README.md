@@ -13,8 +13,8 @@ dependencies on first use.
 cv: build an academic CV, as HTML and PDF, from institutional repositories.
 
 Usage:
-  cv fetch [TYPES ...] [--debug] [--refresh]
-  cv make OUTPUT_TYPES... [--debug]
+  cv fetch CONFIG [TYPES ...] [--debug] [--refresh]
+  cv make CONFIG OUTPUT_TYPES... [--debug]
   cv (-h | --help)
   cv --version
 
@@ -24,6 +24,16 @@ Options:
   --debug       Enable debug output.
   --refresh     Delete cached versions and do a hard refresh from the repository.
 ```
+
+CONFIG selects the scholar to build a CV for. It may be a path to a
+configuration file, or a bare name that is looked up in the `config/`
+directory: `cv fetch martin_paul_eve` finds `config/martin_paul_eve.py`.
+To set up your own CV, copy `config/config.py.example` to
+`config/<your_name>.py` and fill in the identity block at the top: your
+name in plain text, your email addresses, and your ORCID. The eprints
+person identifier is derived from your name automatically. The rest of
+the file defines your CV's layout: sections, headings, templates, and
+outputs are all per-user configuration.
 
 Valid options for "types" for the fetch operation, by default, are:
 
@@ -37,13 +47,14 @@ Valid options for "types" for the fetch operation, by default, are:
 * book_chapters
 * conference_items
 
-These can be extended using the configuration mapping system in `config.py`.
+These can be extended using the configuration mapping system in your
+config file.
 
 An example of default usage might be:
 
 ```
-uv run cv fetch unedited_books edited_books peer_reviewed_articles --refresh --debug
-uv run cv make pdf html
+uv run cv fetch martin_paul_eve unedited_books edited_books peer_reviewed_articles --refresh --debug
+uv run cv make martin_paul_eve pdf html
 ```
 
 The tool includes two output options by default, "html" and "pdf".

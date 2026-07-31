@@ -12,6 +12,8 @@ import os
 
 import requests
 
+from cv.configuration import encode_eprints_user
+
 
 class Repository:
     def __init__(self, config, logger, refresh):
@@ -56,7 +58,11 @@ class Repository:
         if not repo.endswith("/"):
             repo += "/"
 
-        user = self.config.eprints["user"]
+        # a pre-encoded eprints user in the config wins; otherwise the
+        # identifier is derived from the plaintext user name
+        user = self.config.eprints.get(
+            "user", encode_eprints_user(self.config.user)
+        )
         url = f"{repo}cgi/exportview/people/{user}/JSON/{user}.js"
 
         self.logger.debug(f"Built repository URL as: {url}")

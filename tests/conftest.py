@@ -30,7 +30,10 @@ def fake_config(tmp_path):
     data.mkdir()
 
     return SimpleNamespace(
-        eprints={"repo": "eprints.example.ac.uk", "user": "Doe=3AJane=3A=3A"},
+        user="Jane Doe",
+        emails=["jane@example.com"],
+        orcid="0000-0000-0000-0000",
+        eprints={"repo": "eprints.example.ac.uk"},
         section_headings={
             "html": {"books": "Books", "articles": "Articles"},
             "pdf": {"books": "BOOKS", "articles": "ARTICLES"},

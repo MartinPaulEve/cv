@@ -99,6 +99,9 @@ class CiteProc:
             section = re.compile(r"{{" + match + "}}")
             if match in self.config.section_headings[rule]:
                 substitute = self._eprint_substitute(match, rule)
+            elif match.startswith("config:"):
+                # transclude a configuration value, e.g. {{config:user}}
+                substitute = getattr(self.config, match.split(":", 1)[1])
             elif match.startswith("external:"):
                 # run an external command that yields a section into a file
                 # these should be in the format:

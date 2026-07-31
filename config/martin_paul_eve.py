@@ -1,7 +1,14 @@
-# this specifies the base eprints URL and the user page
-eprints = {
-    'repo': 'eprints.bbk.ac.uk',
-    'user': 'Eve=3AMartin_Paul=3A=3A'}
+user = "Martin Paul Eve"
+
+# email addresses that repositories may hold for this user
+emails = ["martin.eve@bbk.ac.uk", "eve@msu.edu", "martin@eve.gd"]
+
+# ORCID identifier, for repository sources that can search by identifier
+orcid = "0000-0002-5589-8511"
+
+# this specifies the base eprints URL; the person identifier is derived
+# automatically from the plaintext user variable above
+eprints = {'repo': 'eprints.bbk.ac.uk'}
 
 # this controls the output headings in the template
 section_headings = {'pdf': {'all_books': "BOOKS",
@@ -96,7 +103,7 @@ output_rules = {'html': ['templates/HTML',
 
                 'pdf': ['templates/PDF',
                         'output/Eve-CV-PDF.html',
-                        'node ./print.js',
+                        'node ./print.js output/Eve-CV-PDF.html output/Eve-CV.pdf',
                         ]}
 
 # define the section template
@@ -123,7 +130,7 @@ gold_oa_direct_link = {'pdf': True,
                        'html': True}
 
 # the email address for OA status display
-email = "martin.eve@bbk.ac.uk"
+email = emails[0]
 
 # basic OA availability
 # note: [[doc]] will insert a space if required

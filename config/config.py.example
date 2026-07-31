@@ -1,0 +1,249 @@
+# Example configuration for the cv generator.
+#
+# Copy this file to config/<your_name>.py, fill in the identity block and
+# the repository details, and run:
+#
+#   uv run cv fetch <your_name> --refresh
+#   uv run cv make <your_name> html pdf
+#
+# A configuration is ordinary Python: everything about the CV — which
+# sections exist, how they are headed, what the item templates look like,
+# and which outputs are produced — is defined here, so each user owns
+# their own layout.
+
+# ---------------------------------------------------------------------------
+# Identity
+# ---------------------------------------------------------------------------
+
+# your name, in plain text; repository modules derive what they need from
+# this (for eprints, "Jane Doe" becomes the person identifier
+# "Doe=3AJane=3A=3A" automatically)
+user = "Jane Doe"
+
+# email addresses that repositories may hold for you
+emails = ["jane.doe@example.ac.uk"]
+
+# your ORCID identifier, for repository sources that search by identifier
+orcid = "0000-0000-0000-0000"
+
+# ---------------------------------------------------------------------------
+# Metadata sources
+# ---------------------------------------------------------------------------
+
+# the base URL of your eprints repository
+eprints = {'repo': 'eprints.example.ac.uk'}
+
+# ---------------------------------------------------------------------------
+# Section definitions
+# ---------------------------------------------------------------------------
+# Each named type (unedited_books, peer_reviewed_articles, and so on) is a
+# CV section. The mappings below control, per section: the heading text,
+# whether items must be peer reviewed, whether they must be edited
+# volumes, whether they are book reviews, which underlying eprints
+# database type they come from, and where the fetched metadata is cached.
+
+# the output headings for each section, per output format
+section_headings = {'pdf': {'unedited_books': "BOOKS",
+                            'edited_books': "EDITED VOLUMES",
+                            'peer_reviewed_articles': "PEER-REVIEWED ARTICLES",
+                            'other_articles': "OTHER ARTICLES",
+                            'reviews': "REVIEWS",
+                            'book_chapters': "BOOK CHAPTERS",
+                            'conference_items': "CONFERENCE PAPERS/EVENTS"},
+
+                    'html': {'unedited_books': "Books",
+                             'edited_books': "Edited Volumes",
+                             'peer_reviewed_articles': "Peer-Reviewed Articles",
+                             'other_articles': "Other Articles",
+                             'reviews': "Reviews",
+                             'book_chapters': "Book Chapters",
+                             'conference_items': "Conference Papers/Events"}}
+
+# whether each section requires peer-reviewed items (True), forbids them
+# (False), or accepts both ("ANY")
+peer_reviewed = {'unedited_books': True,
+                 'edited_books': True,
+                 'peer_reviewed_articles': True,
+                 'other_articles': False,
+                 'reviews': "ANY",
+                 'book_chapters': "ANY",
+                 'conference_items': "ANY"}
+
+# whether each section requires edited items (True), forbids them (False),
+# or accepts both ("ANY")
+editorial = {'unedited_books': False,
+             'edited_books': True,
+             'peer_reviewed_articles': "ANY",
+             'other_articles': "ANY",
+             'reviews': "ANY",
+             'book_chapters': "ANY",
+             'conference_items': "ANY"}
+
+# the text that identifies a book review
+review_of = "Review of"
+
+# whether each section requires book reviews (True), forbids them (False),
+# or accepts both ("ANY")
+book_review = {'unedited_books': False,
+               'edited_books': False,
+               'peer_reviewed_articles': False,
+               'other_articles': False,
+               'reviews': True,
+               'book_chapters': False,
+               'conference_items': False}
+
+# the underlying eprints database type for each section
+eprints_db = {'unedited_books': "book",
+              'edited_books': "book",
+              'peer_reviewed_articles': "article",
+              'other_articles': "article",
+              'reviews': "article",
+              'book_chapters': "book_section",
+              'conference_items': "conference_item"}
+
+# where fetched metadata is cached on disk
+storage = {'json': 'data/eprints.json',
+           'unedited_books': "data/unedited_books.json",
+           'edited_books': "data/edited_books.json",
+           'peer_reviewed_articles': "data/peer_reviewed_articles.json",
+           'other_articles': "data/other_articles.json",
+           'reviews': "data/reviews.json",
+           'book_chapters': "data/book_sections.json",
+           'conference_items': "data/conference_items.json"}
+
+# the sections fetched when none are named on the command line
+default_types = ['unedited_books', 'edited_books', 'peer_reviewed_articles']
+
+# ---------------------------------------------------------------------------
+# Outputs and layout
+# ---------------------------------------------------------------------------
+
+# output documents: each rule is [template, destination, commands...]
+# where the optional trailing shell commands post-process the output
+output_rules = {'html': ['templates/HTML',
+                         'output/CV.html'],
+
+                'pdf': ['templates/PDF',
+                        'output/CV-PDF.html',
+                        'node ./print.js output/CV-PDF.html output/CV.pdf',
+                        ]}
+
+# the wrapper placed around each generated section
+section_template = {'pdf': '<section id="{0}">{1}</section>',
+                    'html': '<section id="{0}">{1}</section>'}
+
+# the section heading, receiving the heading text and the item count
+header_template = {'pdf': '<h2 class="sectionheader">{0} ({1})</h2>',
+                   'html': '<h3 class="sectionheader">{0} ({1})</h3>'}
+
+# the list wrapper placed around the items of each publication section
+# (the inline style keeps the HTML fragment self-contained when it is
+# transcluded into another site; line-height 1.6 keeps link targets at or
+# above the 24 CSS pixel minimum of WCAG 2.5.8)
+list_template = {'pdf': '<ul class="publist">{0}</ul>',
+                 'html': '<ul class="publist" style="list-style:none;margin:0;'
+                         'padding:0;line-height:1.6">{0}</ul>'}
+
+# the per-item templates; [[citeproc]] receives the formatted citation,
+# [[oa_status]] the open access link, [[year]] the item's year
+_types = list(eprints_db)
+
+_pdf_item = ('<li class="anitem genericitem"><span class="prefix" '
+             'aria-hidden="true">&nbsp;</span><span class="bibitem">'
+             '[[citeproc]]</span></li>')
+
+_html_item = ('<li class="anitem genericitem"><span class="prefix" '
+              'aria-hidden="true">&nbsp;</span><span class="bibitem">'
+              '[[citeproc]] [[oa_status]]</span></li>')
+
+citeproc_item_templates = {'pdf': {t: _pdf_item for t in _types},
+                           'html': {t: _html_item for t in _types}}
+
+_pdf_item_new_date = ('<li class="anitemnewdate genericitem"><span '
+                      'class="prefix bold" aria-hidden="true">[[year]]</span>'
+                      '<span class="bibitem">[[citeproc]]</span></li>')
+
+_html_item_new_date = ('<li class="anitemnewdate genericitem"><span '
+                       'class="prefix bold" aria-hidden="true">[[year]]</span>'
+                       '<span class="bibitem">[[citeproc]] [[oa_status]]'
+                       '</span></li>')
+
+citeproc_item_templates_new_date = {
+    'pdf': {t: _pdf_item_new_date for t in _types},
+    'html': {t: _html_item_new_date for t in _types}}
+
+# ---------------------------------------------------------------------------
+# Open access display
+# ---------------------------------------------------------------------------
+
+# whether to replace repository links with the official URL for gold OA
+gold_oa_direct_link = {'pdf': True,
+                       'html': True}
+
+# the email address shown for open access queries
+email = emails[0]
+
+# the open access download link; the aria-label names the link target
+# (WCAG 2.4.9) and states the route in text, not colour alone (1.4.1)
+oa_status = {'html': ' [<a href="[[oa_uri]]" style="color:[[oa_color]]" '
+                     'aria-label="Download the [[oa_route]] open access '
+                     'version of [[title]]">Download[[doc]]</a>]'}
+
+# what to show when an item is not open access
+non_oa_status = {'html': ''}
+
+# colours for open access links; both meet the WCAG 2.2 AAA enhanced
+# contrast ratio of 7:1 on a white background — check replacements with
+# cv.accessibility.meets_aaa before changing them
+oa_colors = {'gold': '#6B5300',
+             'green': '#175117'}
+
+# ---------------------------------------------------------------------------
+# Formatting details
+# ---------------------------------------------------------------------------
+
+# venues to exclude, per output format and section (comma-separated)
+exclude_venues = {'pdf': {},
+                  'html': {}}
+
+# whether to italicize known titles within citation text
+italicize_titles = {'pdf': True,
+                    'html': True}
+
+# titles to italicize inside other titles; for this to work your CSS must
+# include: i i { font-style: normal; }
+titles_to_italicize = []
+
+# the names of the creator/editor fields in the repository metadata
+creators_item_name = 'creators'
+creator_field_top_level = 'name'
+creator_field_given_name = 'given'
+creator_field_last_name = 'family'
+
+editors_item_name = 'editors'
+editor_field_top_level = 'name'
+editor_field_given_name = 'given'
+editor_field_last_name = 'family'
+
+# ---------------------------------------------------------------------------
+# Citation rendering
+# ---------------------------------------------------------------------------
+
+# the directory holding vendored CSL styles and locales
+csl_directory = 'static/csl'
+
+# the CSL locale used for citation rendering
+citeproc_locale = 'en-GB'
+
+# the CSL type for each section
+citeproc_type_mapper = {'unedited_books': "book",
+                        'edited_books': "book",
+                        'peer_reviewed_articles': "article-journal",
+                        'other_articles': "article-journal",
+                        'reviews': "article-journal",
+                        'book_chapters': "chapter",
+                        'conference_items': "paper-conference"}
+
+# the citeproc style to use (a .csl file in csl_directory)
+citeproc_style = {'pdf': 'modern-humanities-research-association',
+                  'html': 'modern-humanities-research-association'}

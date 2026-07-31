@@ -13,9 +13,14 @@ const fs = require('fs');
 const path = require('path');
 const puppeteer = require('puppeteer');
 
+/* usage: node print.js [input.html] [output.pdf]
+ * paths are relative to the project root; defaults preserve the
+ * historical file names */
+const [, , inputArg, outputArg] = process.argv;
+
 const PROJECT_ROOT = __dirname;
-const INPUT_PATH = '/output/Eve-CV-PDF.html';
-const OUTPUT = path.resolve(__dirname, 'output', 'Eve-CV.pdf');
+const INPUT_PATH = '/' + (inputArg || 'output/Eve-CV-PDF.html');
+const OUTPUT = path.resolve(PROJECT_ROOT, outputArg || 'output/Eve-CV.pdf');
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',

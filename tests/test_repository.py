@@ -49,7 +49,9 @@ SAMPLE_ITEMS = [
 
 
 class TestUrlBuilding:
-    def test_scheme_and_path_are_added(self, repo):
+    def test_user_name_is_encoded_into_the_url(self, repo):
+        """The plaintext config user is converted to the eprints escaped
+        person-identifier format when the endpoint URL is built."""
         assert repo.url == (
             "https://eprints.example.ac.uk/cgi/exportview/people/"
             "Doe=3AJane=3A=3A/JSON/Doe=3AJane=3A=3A.js"
@@ -59,6 +61,13 @@ class TestUrlBuilding:
         fake_config.eprints["repo"] = "http://eprints.example.ac.uk/"
         repo = Repository(fake_config, logger, refresh=False)
         assert repo.url.startswith("http://eprints.example.ac.uk/cgi/")
+
+    def test_pre_encoded_user_is_honoured_when_present(self, fake_config, logger):
+        """A config may still carry an explicit pre-encoded eprints user,
+        which wins over the derived encoding."""
+        fake_config.eprints["user"] = "Custom=3APerson=3A=3A"
+        repo = Repository(fake_config, logger, refresh=False)
+        assert "Custom=3APerson=3A=3A" in repo.url
 
 
 class TestFilters:
