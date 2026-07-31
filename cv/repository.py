@@ -1,7 +1,16 @@
+"""Fetch and classify publication metadata from an eprints repository.
+
+The Repository class downloads a scholar's publication list from an
+eprints "exportview" JSON endpoint, caches it on disk, and splits it into
+per-section files (books, articles, and so on) according to the rules in
+the configuration: peer-review status, editorial status, and whether an
+item is a book review.
+"""
+
+import json
 import os
 
 import requests
-import json
 
 
 class Repository:
@@ -10,7 +19,8 @@ class Repository:
         Initialise a repository
         :param config: a configuration
         :param logger: a logger
-        :param refresh: whether fetch operations should hit the remote endpoint even if there is an on-disk copy
+        :param refresh: whether fetch operations should hit the remote endpoint
+            even if there is an on-disk copy
         """
         self.config = config
         self.logger = logger
@@ -22,18 +32,15 @@ class Repository:
 
     def __getattr__(self, name):
         """
-        A generic getter for undefined attributes that we use to return types (e.g. repo.book_sections)
+        A generic getter for undefined attributes that we use to return types
+        (e.g. repo.book_sections)
         :param name: the name of the attr
         """
         try:
-            with open(self.config.storage[name], "r") as json_in_file:
-                data = json_in_file.readlines()
-                output = []
-                for line in data:
-                    output.append(json.loads(line))
-                return output
-        except EnvironmentError:
-            self.logger.error('Cannot load json from {0}'.format(self.config.storage[name]))
+            with open(self.config.storage[name]) as json_in_file:
+                return [json.loads(line) for line in json_in_file.readlines()]
+        except OSError:
+            self.logger.error(f"Cannot load json from {self.config.storage[name]}")
             return None
 
     def _build_repo_url(self):
@@ -41,65 +48,66 @@ class Repository:
         Creates the eprints endpoint URL
         :return: an eprints endpoint URL string
         """
-        # build the repository path
-        repo = self.config.eprints['repo']
+        repo = self.config.eprints["repo"]
 
-        if not (repo.startswith("htt")):
+        if not repo.startswith("htt"):
             repo = "https://" + repo
 
-        if not (repo.endswith("/")):
+        if not repo.endswith("/"):
             repo += "/"
 
-        url = repo + "cgi/exportview/people/" + self.config.eprints['user'] + "/JSON/"
-        url += self.config.eprints['user'] + ".js"
+        user = self.config.eprints["user"]
+        url = f"{repo}cgi/exportview/people/{user}/JSON/{user}.js"
 
-        self.logger.debug('Built repository URL as: {0}'.format(url))
+        self.logger.debug(f"Built repository URL as: {url}")
 
         return url
 
     def _populate_json(self, refresh):
         """
-        Updates the internal json object either from the on-disk file or from the remote repo
-        :param refresh: whether to refresh the remote repository even if there is an on-disk representation
+        Updates the internal json object either from the on-disk file or from
+        the remote repo
+        :param refresh: whether to refresh from the remote repository even if
+            there is an on-disk representation
         :return: boolean indicating whether the operation succeeded
         """
-
-        # determine whether to refresh the JSON
         if not os.path.isfile(self.config.storage["json"]) or refresh:
-            self.logger.debug("Attempting to refresh {0}".format(self.url))
+            self.logger.debug(f"Attempting to refresh {self.url}")
 
             try:
-                # download the JSON
-                data = requests.get(self.url, verify=False).text
+                data = requests.get(self.url).text
             except requests.RequestException as exc:
-                self.logger.error("Error fetching eprints data: {0}".format(exc))
+                self.logger.error(f"Error fetching eprints data: {exc}")
                 self._json_loaded = False
                 return False
 
             try:
-                # write the JSON to the output file
                 with open(self.config.storage["json"], "w") as json_out_file:
                     json_out_file.write(data)
                     self.json = json.loads(data)
                     self._json_loaded = True
                     return True
-            except EnvironmentError:
-                self.logger.error('Cannot write json data to {0}'.format(self.config.storage["json"]))
-                # try to delete the file
+            except OSError:
+                self.logger.error(
+                    f"Cannot write json data to {self.config.storage['json']}"
+                )
                 os.remove(self.config.storage["json"])
                 self._json_loaded = False
                 return False
         else:
-            # load the JSON from the disk instead
-            self.logger.debug("Attempting to load JSON from data store {0}".format(self.config.storage["json"]))
+            self.logger.debug(
+                f"Attempting to load JSON from data store "
+                f"{self.config.storage['json']}"
+            )
             try:
-                with open(self.config.storage["json"], "r") as json_in_file:
-                    data = json_in_file.read()
-                    self.json = json.loads(data)
+                with open(self.config.storage["json"]) as json_in_file:
+                    self.json = json.load(json_in_file)
                     self._json_loaded = True
                     return True
-            except EnvironmentError:
-                self.logger.error('Cannot load json from {0}'.format(self.config.storage["json"]))
+            except OSError:
+                self.logger.error(
+                    f"Cannot load json from {self.config.storage['json']}"
+                )
                 self._json_loaded = False
                 return False
 
@@ -107,17 +115,15 @@ class Repository:
         """
         Parse JSON from eprints into sections
         :param types: the types to parse
-        :param load_json: whether this function should attempt to load the JSON from the repo
-        :param check_types: whether this function should attempt to check type validity
+        :param load_json: whether this function should attempt to load the JSON
+        :param check_types: whether this function should check type validity
         :return: True if successful, otherwise False
         """
-        self.logger.debug("Attempting to parse types {0}".format(types))
+        self.logger.debug(f"Attempting to parse types {types}")
 
-        # perform the prechecks
         if not self._parse_prechecks(check_types, load_json, types):
             return False
 
-        # build a dictionary of output types with items in them
         self.logger.debug("Building output list")
         outputs = self._build_output_types_list()
 
@@ -130,15 +136,17 @@ class Repository:
         :return: True if success, otherwise False
         """
         for output_type, output_list in outputs.items():
-            self.logger.debug("Writing {0} to {1}".format(output_type, self.config.storage[output_type]))
+            self.logger.debug(
+                f"Writing {output_type} to {self.config.storage[output_type]}"
+            )
             try:
-                # write the JSON to the output file
                 with open(self.config.storage[output_type], "w") as json_out_file:
                     for output in output_list:
-                        json_out_file.write(json.dumps(output) + '\n')
-            except EnvironmentError:
-                self.logger.error('Cannot write json data to {0}'.format(self.config.storage["json"]))
-                # try to delete the file
+                        json_out_file.write(json.dumps(output) + "\n")
+            except OSError:
+                self.logger.error(
+                    f"Cannot write json data to {self.config.storage[output_type]}"
+                )
                 os.remove(self.config.storage[output_type])
                 self._json_loaded = False
                 return False
@@ -147,37 +155,36 @@ class Repository:
     def _build_output_types_list(self):
         """
         Build a dictionary of output types with corresponding outputs within
-        :return: a dictionary of output types as keys with corresponding outputs within
+        :return: a dictionary of output types as keys with corresponding
+            outputs within
         """
         outputs = {}
 
         eprints_db_vals = list(self.config.eprints_db.values())
 
         for item in self.json:
-            if item['type'] in eprints_db_vals:
-                # this is an item that we need to handle
-
-                # do a naughty reverse dictionary lookup of all types that correspond
+            if item["type"] in eprints_db_vals:
+                # find all configured section types that match this item, then
+                # narrow them down by the section criteria
                 potential_types = self._get_potential_types(item)
-
-                # reduce the types according to the allowed peer review criteria
                 potential_types = self._filter_by_peer_review(item, potential_types)
-
-                # reduce the types according to the allowed edited criteria
                 potential_types = self._filter_by_editorial(item, potential_types)
-
-                # reduce the types according to the allowed book review criteria
                 potential_types = self._filter_by_book_review(item, potential_types)
 
-                # we now have a list of types to add to the output dictionary
                 for remaining_type in potential_types:
                     if remaining_type not in outputs:
-                        self.logger.debug("Adding type {0} to outputs for the first time".format(remaining_type))
+                        self.logger.debug(
+                            f"Adding type {remaining_type} to outputs "
+                            f"for the first time"
+                        )
                         outputs[remaining_type] = []
 
                     outputs[remaining_type].append(item)
             else:
-                self.logger.debug("Unsure how to handle type {0} for item {1}".format(item['type'], item['title']))
+                self.logger.debug(
+                    f"Unsure how to handle type {item['type']} "
+                    f"for item {item['title']}"
+                )
 
         return outputs
 
@@ -191,21 +198,23 @@ class Repository:
         filtered_types = []
 
         for potential_type in potential_types:
-            # determine whether the potential type matches the review criteria
-            if self.config.book_review[potential_type] == 'ANY':
-                # this type allows both book review and non-book-review items
-                filtered_types.append(potential_type)
+            is_review = item["title"].startswith(self.config.review_of)
+            setting = self.config.book_review[potential_type]
 
-            elif self.config.book_review[potential_type] and item['title'].startswith(self.config.review_of):
+            if setting == "ANY":
+                # this type allows both book reviews and non-reviews
+                filtered_types.append(potential_type)
+            elif setting and is_review:
                 # this type allows only book reviews
                 filtered_types.append(potential_type)
-
-            elif not self.config.book_review[potential_type] and \
-                    item['title'].startswith(self.config.review_of) is False:
-                # this type allows only non-book-reviews
+            elif not setting and not is_review:
+                # this type allows only non-reviews
                 filtered_types.append(potential_type)
 
-        self.logger.debug("Reduced types for {0} to {1} [book review filter]".format(item['title'], filtered_types))
+        self.logger.debug(
+            f"Reduced types for {item['title']} to {filtered_types} "
+            f"[book review filter]"
+        )
         return filtered_types
 
     def _filter_by_editorial(self, item, potential_types):
@@ -218,20 +227,22 @@ class Repository:
         filtered_types = []
 
         for potential_type in potential_types:
-            # determine whether the potential type matches the editorial criteria
-            if self.config.editorial[potential_type] == 'ANY':
+            setting = self.config.editorial[potential_type]
+
+            if setting == "ANY":
                 # this type allows both edited and non-edited items
                 filtered_types.append(potential_type)
-
-            elif self.config.editorial[potential_type] and 'editors' in item:
+            elif setting and "editors" in item:
                 # this type allows only edited items
                 filtered_types.append(potential_type)
-
-            elif not self.config.editorial[potential_type] and 'editors' not in item:
+            elif not setting and "editors" not in item:
                 # this type allows only non-edited items
                 filtered_types.append(potential_type)
 
-        self.logger.debug("Reduced types for {0} to {1} [editorial filter]".format(item['title'], filtered_types))
+        self.logger.debug(
+            f"Reduced types for {item['title']} to {filtered_types} "
+            f"[editorial filter]"
+        )
         return filtered_types
 
     def _filter_by_peer_review(self, item, potential_types):
@@ -244,35 +255,39 @@ class Repository:
         filtered_types = []
 
         for potential_type in potential_types:
-            # determine whether the potential type matches the review criteria
-            if self.config.peer_reviewed[potential_type] == 'ANY':
+            refereed = item.get("refereed")
+            setting = self.config.peer_reviewed[potential_type]
+
+            if setting == "ANY":
                 # this type allows both peer-reviewed and non-peer-reviewed items
                 filtered_types.append(potential_type)
-
-            elif self.config.peer_reviewed[potential_type] and 'refereed' in item and item['refereed'] == 'TRUE':
+            elif setting and refereed == "TRUE":
                 # this type allows only peer-reviewed items
                 filtered_types.append(potential_type)
-
-            elif not self.config.peer_reviewed[potential_type] and 'refereed' in item and item['refereed'] == 'FALSE':
+            elif not setting and refereed == "FALSE":
                 # this type allows only non-peer-reviewed items
                 filtered_types.append(potential_type)
 
-        self.logger.debug("Reduced types for {0} to {1} [peer review filter]".format(item['title'], filtered_types))
+        self.logger.debug(
+            f"Reduced types for {item['title']} to {filtered_types} "
+            f"[peer review filter]"
+        )
         return filtered_types
 
     def _get_potential_types(self, item):
         """
-        Builds a list of potential sub-types for an item, which can then be matched against for peer review criteria
+        Builds a list of potential sub-types for an item, which can then be
+        matched against the section criteria
         :param item: the JSON item from eprints
         :return: a list of potential sub-types for the item
         """
-        sub_types = []
+        sub_types = [
+            key for key, val in self.config.eprints_db.items() if val == item["type"]
+        ]
 
-        for key, val in self.config.eprints_db.items():
-            if val == item['type']:
-                sub_types.append(key)
-
-        self.logger.debug("Potential sub-types for item {0} are {1}".format(item['title'], sub_types))
+        self.logger.debug(
+            f"Potential sub-types for item {item['title']} are {sub_types}"
+        )
         return sub_types
 
     def _parse_prechecks(self, check_types, load_json, types):
@@ -283,24 +298,18 @@ class Repository:
         :param types: A list of input types
         :return: True if checks OK, otherwise False
         """
-        # if the user has asked us to load the JSON here as a shortcut, do it
         if load_json and not self._json_loaded:
             self.logger.debug("Loading JSON via shortcut")
             if not self._populate_json(self.refresh):
                 return False
-
-        # check if the JSON is loaded and error if not
         elif not self._json_loaded:
             self.logger.error("JSON is not loaded")
             return False
 
-        # if the user has asked us to check the types here as a shortcut, do it
         if check_types and not self._type_safe:
             self.logger.debug("Checking types via shortcut")
             if not self._check_types(types):
                 return False
-
-        # make sure that we recognise all the types that are being passed in
         elif not self._type_safe:
             self.logger.error("Types are not safe")
             return False
@@ -314,32 +323,31 @@ class Repository:
         :param types: A list of types to check
         :return: True if types are OK, otherwise False
         """
-        # make sure we have a storage entry, a peer review setting, and a heading for each type
         self.logger.debug("Checking that all types are valid")
         errors = []
 
-        for input_type in types:
-            if input_type not in self.config.storage:
-                errors.append('No storage entry found for type {0}'.format(input_type))
-            if input_type not in self.config.peer_reviewed:
-                errors.append('No peer review setting found for type {0}'.format(input_type))
-            if input_type not in self.config.editorial:
-                errors.append('No editorial setting found for type {0}'.format(input_type))
-            if input_type not in self.config.book_review:
-                errors.append('No book review setting found for type {0}'.format(input_type))
-            if input_type not in self.config.eprints_db:
-                errors.append('No eprints_db setting found for type {0}'.format(input_type))
+        requirements = [
+            (self.config.storage, "storage entry"),
+            (self.config.peer_reviewed, "peer review setting"),
+            (self.config.editorial, "editorial setting"),
+            (self.config.book_review, "book review setting"),
+            (self.config.eprints_db, "eprints_db setting"),
+        ]
 
-        if len(errors) > 0:
+        for input_type in types:
+            for mapping, description in requirements:
+                if input_type not in mapping:
+                    errors.append(f"No {description} found for type {input_type}")
+
+        if errors:
             for err in errors:
                 self.logger.error(err)
 
             self._type_safe = False
-
             return False
-        else:
-            self._type_safe = True
-            return True
+
+        self._type_safe = True
+        return True
 
     def fetch(self, types):
         """
@@ -347,14 +355,10 @@ class Repository:
         :param types: A list of types to parse from the repository
         :return: True if successful, otherwise False
         """
-        # make sure that we recognise all the types that are being passed in
         if not self._check_types(types):
             return False
 
-        # populate the JSON field
         if not self._populate_json(self.refresh):
             return False
 
-        # attempt to parse the requested sections
-        if not self._parse_json(types):
-            return False
+        return self._parse_json(types)

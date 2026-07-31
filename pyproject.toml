@@ -1,0 +1,51 @@
+[project]
+name = "cv"
+version = "1.0.0"
+description = "Build an accessible academic CV, as HTML and PDF, from institutional repository metadata"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { file = "LICENSE" }
+authors = [{ name = "Martin Paul Eve", email = "martin@eve.gd" }]
+dependencies = [
+    "docopt-ng>=0.9.0",
+    "requests>=2.32.0",
+    "rich>=13.0.0",
+]
+
+[project.scripts]
+cv = "cv.cli:run"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cv"]
+
+[tool.commitizen]
+version = "1.0.0"
+version_files = [
+    "__version__.py",
+    "pyproject.toml:version"
+]
+update_changelog_on_bump = true
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+# SIM114 wants parallel if/elif branches collapsed into compound boolean
+# expressions; the filter logic is deliberately spelled out branch by branch
+# for readability.
+ignore = ["SIM114"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
