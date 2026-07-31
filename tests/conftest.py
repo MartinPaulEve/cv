@@ -79,10 +79,16 @@ def fake_config(tmp_path):
         gold_oa_direct_link={"html": True, "pdf": True},
         email="jane@example.com",
         oa_status={
-            "html": ' [<a href="[[oa_uri]]" '
-            'style="color:[[oa_color]]">Download[[doc]]</a>]'
+            "html": ' [<a href="[[oa_uri]]" style="color:[[oa_color]]" '
+            'aria-label="Download the [[oa_route]] open access version of '
+            '[[title]]">Download[[doc]]</a>]'
         },
         non_oa_status={"html": ""},
+        oa_colors={"gold": "#6B5300", "green": "#175117"},
+        list_template={
+            "html": '<ul class="publist" '
+            'style="list-style:none;margin:0;padding:0">{0}</ul>'
+        },
         exclude_venues={"html": {}},
         italicize_titles={"html": True, "pdf": False},
         titles_to_italicize=["Gravity's Rainbow", "2666"],

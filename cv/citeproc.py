@@ -16,6 +16,12 @@ from multiprocessing.pool import Pool
 
 import requests
 
+from cv.accessibility import strip_markup
+
+# fallback open access colours, used when a configuration predates the
+# oa_colors setting; both meet the WCAG AAA 7:1 contrast ratio on white
+DEFAULT_OA_COLORS = {"gold": "#6B5300", "green": "#175117"}
+
 
 class CiteProc:
     def __init__(self, repo, config, logger):
@@ -232,10 +238,16 @@ class CiteProc:
             oa_status = self.config.oa_status[rule]
             non_oa_status = self.config.non_oa_status[rule]
 
+            # the accessible name must identify the link target as plain text
+            # (WCAG 2.4.9) and state the route so that gold versus green is
+            # not conveyed by colour alone (WCAG 1.4.1)
+            oa_status = oa_status.replace("[[title]]", strip_markup(item["title"]))
+            oa_status = oa_status.replace("[[oa_route]]", item.get("oa_status", ""))
+
             if "oa_status" in item:
                 if item["oa_status"] == "green" or item["oa_status"] == "gold":
-                    is_gold = item["oa_status"] == "gold"
-                    oa_color = "goldenrod" if is_gold else item["oa_status"]
+                    oa_colors = getattr(self.config, "oa_colors", DEFAULT_OA_COLORS)
+                    oa_color = oa_colors[item["oa_status"]]
                     if "files" in item:
                         oa_status = (
                             oa_status.replace("[[oa_uri]]", item["files"][0]["url"])
@@ -451,6 +463,12 @@ class CiteProc:
             header_output = header_template.format(
                 self.config.section_headings[rule][section], item_count
             )
+
+            # publication runs are wrapped in a real list element so that
+            # assistive technology announces them as navigable lists
+            list_templates = getattr(self.config, "list_template", {})
+            if rule in list_templates:
+                output_string = list_templates[rule].format(output_string)
 
             section_output = section_template.format(
                 section, header_output + output_string
