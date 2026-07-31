@@ -1,22 +1,19 @@
 """Render publication metadata into formatted CV sections.
 
-The CiteProc class converts eprints items into CSL-JSON, sends them to a
-citeproc-js-server instance for bibliographic formatting, and assembles
-the results — together with static section files and template documents —
-into the final HTML outputs.
+The CiteProc class converts eprints items into CSL-JSON, formats them
+through an in-process citation renderer, and assembles the results —
+together with static section files and template documents — into the
+final HTML outputs.
 """
 
 import os
 import re
 import subprocess
-import time
 from contextlib import suppress
 from datetime import datetime
-from multiprocessing.pool import Pool
-
-import requests
 
 from cv.accessibility import strip_markup
+from cv.renderer import CitationRenderer
 
 # fallback open access colours, used when a configuration predates the
 # oa_colors setting; both meet the WCAG AAA 7:1 contrast ratio on white
@@ -24,48 +21,13 @@ DEFAULT_OA_COLORS = {"gold": "#6B5300", "green": "#175117"}
 
 
 class CiteProc:
-    def __init__(self, repo, config, logger):
+    def __init__(self, repo, config, logger, renderer=None):
         self.config = config
         self.logger = logger
         self.repo = repo
+        self.renderer = renderer or CitationRenderer(config, logger)
 
         self.cached_italic_regexen = []
-
-        # the commands used to start the citeproc-js server instances
-        self.init_commands = [
-            f'screen -S serve_npm{port} -d -m bash -c '
-            f'"node lib/citeServer.js --port {port} > log.txt"'
-            for port in config.citeproc_ports
-        ]
-
-    def start(self):
-        """
-        Start the NPM citeproc-js server
-        :return: Nothing
-        """
-        for shell_script in self.init_commands:
-            subprocess.call(
-                shell_script,
-                shell=True,
-                cwd=self.config.citeproc_js_server_directory,
-            )
-        time.sleep(self.config.citeproc_delay)
-        self.logger.info("Started citeproc-js-server(s)")
-
-    def shutdown(self):
-        """
-        Shutdown the NPM citeproc-js server
-        :return: Nothing
-        """
-        shutdown_commands = [
-            f'screen -d -m bash -c "screen -S serve_npm{port} -X quit"'
-            for port in self.config.citeproc_ports
-        ]
-
-        for shell_script in shutdown_commands:
-            subprocess.call(shell_script, shell=True)
-
-        self.logger.info("Shutdown citeproc-js-server")
 
     def build(self, rules):
         """
@@ -308,17 +270,6 @@ class CiteProc:
 
         return line
 
-    @staticmethod
-    def _get_citeproc_response(citeproc_server, citeproc_style, output, rule, port):
-        # we have to do this _every_ time sadly because otherwise the CSL
-        # substitutes repeated author names with "---"
-        response = requests.post(
-            f"{citeproc_server.format(port)}?bibliography=1&responseformat=json&style={citeproc_style[rule]}",
-            json=output,
-        )
-
-        return response.json()
-
     def _eprint_substitute(self, section, rule):
         """
         Substitute in a section from the repository
@@ -339,90 +290,42 @@ class CiteProc:
         self.logger.debug(f"Fetching {section} from repo")
         section_items = self.repo.__getattr__(section)
 
-        current_date = ""
-
-        output = {}
-        items = {}
-        counter = 0
-
-        output["items"] = items
-        output_string = ""
-
-        exclude_items = self.config.exclude_venues
-
         item_count = len(section_items)
 
+        exclude_items = self.config.exclude_venues
         if rule in exclude_items and section in exclude_items[rule]:
             exclude_venues = exclude_items[rule][section].split(",")
         else:
             exclude_venues = []
 
-        identifier_list = []
-        starmap_args = []
+        # convert every non-excluded repository item to CSL-JSON
+        csl_items = []
         the_date_list = []
         item_list = []
-        for port_var, item in enumerate(section_items):
-            # spread requests across the available citeproc server ports
-            port = self.config.citeproc_ports[
-                port_var % len(self.config.citeproc_ports)
-            ]
+
+        for item in section_items:
             if "publication" in item and item["publication"] in exclude_venues:
                 item_count -= 1
-            else:
-                # format the date
-                the_date = self._build_date(item)
+                continue
 
-                # italicize title
-                self._italicize_titles(item, rule)
+            the_date = self._build_date(item)
+            self._italicize_titles(item, rule)
 
-                # build the CSL-JSON for this item
-                identifier = f"{counter}-{the_date}"
-                items[identifier] = {}
+            csl_items.append(
+                self._build_csl_item(item, len(csl_items), section, the_date, rule)
+            )
+            item_list.append(item)
+            the_date_list.append(the_date)
 
-                items[identifier]["id"] = identifier
-                items[identifier]["title"] = item["title"]
+        # format all of the section's citations in one renderer call
+        entries = self.renderer.render(csl_items, self.config.citeproc_style[rule])
 
-                self._build_creators(identifier, item, items)
-                self._build_editors(identifier, item, items)
+        output_string = ""
+        current_date = ""
 
-                items[identifier]["type"] = self.config.citeproc_type_mapper[section]
-
-                self._build_publisher(identifier, item, items)
-
-                items[identifier]["issued"] = {"date-parts": [[the_date]]}
-
-                self._build_container(identifier, item, items)
-                self._build_volume(identifier, item, items)
-                self._build_pages(identifier, item, items)
-                self._build_identifier(identifier, item, items, rule)
-                self._build_event(identifier, item, items)
-
-                item_list.append(item)
-                identifier_list.append(identifier)
-                the_date_list.append(the_date)
-
-                starmap_args.append(
-                    (
-                        self.config.citeproc_server,
-                        self.config.citeproc_style,
-                        output,
-                        rule,
-                        port,
-                    )
-                )
-
-                output = {}
-                items = {}
-                output["items"] = items
-
-                counter += 1
-
-        # spawn requests to citeproc server(s) using multiprocessing
-        with Pool() as pool:
-            json_response = pool.starmap(self._get_citeproc_response, starmap_args)
-
-        for loop_counter, item in enumerate(item_list):
-            # build the oa_status
+        for item, entry, the_date in zip(
+            item_list, entries, the_date_list, strict=True
+        ):
             oa_status = self._build_oa_status(item, rule)
 
             output_string, current_date = self._append_item(
@@ -430,15 +333,46 @@ class CiteProc:
                 item,
                 item_templates,
                 item_templates_new_date,
-                json_response[loop_counter],
+                entry,
                 oa_status,
                 output_string,
-                the_date_list[loop_counter],
+                the_date,
             )
 
         return self._finalize_section(
             header_template, item_count, output_string, rule, section, section_template
         )
+
+    def _build_csl_item(self, item, counter, section, the_date, rule):
+        """
+        Convert one repository item into a CSL-JSON dictionary
+        :param item: the repository item
+        :param counter: the position of the item within its section
+        :param section: the section name
+        :param the_date: the item's formatted year
+        :param rule: the output rule in play
+        :return: a CSL-JSON dictionary for the item
+        """
+        identifier = f"{counter}-{the_date}"
+        items = {
+            identifier: {
+                "id": identifier,
+                "title": item["title"],
+                "type": self.config.citeproc_type_mapper[section],
+                "issued": {"date-parts": [[the_date]]},
+            }
+        }
+
+        self._build_creators(identifier, item, items)
+        self._build_editors(identifier, item, items)
+        self._build_publisher(identifier, item, items)
+        self._build_container(identifier, item, items)
+        self._build_volume(identifier, item, items)
+        self._build_pages(identifier, item, items)
+        self._build_identifier(identifier, item, items, rule)
+        self._build_event(identifier, item, items)
+
+        return items[identifier]
 
     def _build_container(self, identifier, item, items):
         # if the type is 'book', don't add a container
@@ -483,28 +417,20 @@ class CiteProc:
         item,
         item_templates,
         item_templates_new_date,
-        json_response,
+        entry,
         oa_status,
         output_string,
         the_date,
     ):
-        if len(json_response["bibliography"][1]) > 0:
+        if entry:
             if current_date != the_date:
                 line = self._substitute_item_template(
-                    item_templates_new_date,
-                    json_response["bibliography"][1][0],
-                    the_date,
-                    item,
-                    oa_status,
+                    item_templates_new_date, entry, the_date, item, oa_status
                 )
                 current_date = the_date
             else:
                 line = self._substitute_item_template(
-                    item_templates,
-                    json_response["bibliography"][1][0],
-                    the_date,
-                    item,
-                    oa_status,
+                    item_templates, entry, the_date, item, oa_status
                 )
 
             output_string += line

@@ -48,11 +48,3 @@ def test_make_builds_requested_outputs(doubles):
     _, citeproc = doubles
     cli.main(["make", "html", "pdf"])
     citeproc.build.assert_called_once_with(["html", "pdf"])
-
-
-def test_citeproc_server_shut_down_even_when_build_fails(doubles):
-    _, citeproc = doubles
-    citeproc.build.side_effect = RuntimeError("boom")
-    with pytest.raises(RuntimeError):
-        cli.main(["make", "html"])
-    citeproc.shutdown.assert_called_once()

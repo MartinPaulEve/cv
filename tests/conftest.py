@@ -100,12 +100,21 @@ def fake_config(tmp_path):
         editor_field_top_level="name",
         editor_field_given_name="given",
         editor_field_last_name="family",
-        citeproc_js_server_directory=str(tmp_path),
-        citeproc_item_templates={},
-        citeproc_item_templates_new_date={},
+        citeproc_item_templates={
+            "html": {
+                "books": '<li class="anitem"><span class="bibitem">'
+                "[[citeproc]] [[oa_status]]</span></li>"
+            }
+        },
+        citeproc_item_templates_new_date={
+            "html": {
+                "books": '<li class="anitemnewdate"><span class="prefix" '
+                'aria-hidden="true">[[year]]</span><span class="bibitem">'
+                "[[citeproc]] [[oa_status]]</span></li>"
+            }
+        },
         citeproc_type_mapper={"books": "book", "articles": "article-journal"},
         citeproc_style={"html": "modern-humanities-research-association"},
-        citeproc_server="http://127.0.0.1:{0}",
-        citeproc_delay=0,
-        citeproc_ports=["8085", "8086"],
+        csl_directory="static/csl",
+        citeproc_locale="en-GB",
     )

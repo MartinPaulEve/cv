@@ -199,8 +199,11 @@ editor_field_top_level = 'name'
 editor_field_given_name = 'given'
 editor_field_last_name = 'family'
 
-# citeproc support
-citeproc_js_server_directory = '/home/martin/Documents/Programming/citeproc-js-server'
+# the directory holding vendored CSL styles and locales
+csl_directory = 'static/csl'
+
+# the CSL locale used for citation rendering
+citeproc_locale = 'en-GB'
 
 # define the item templates in citeproc mode
 # each item is a list entry; the prefix column is aria-hidden because it is a
@@ -248,12 +251,3 @@ citeproc_type_mapper = {'all_books': "book",
 # the citeproc style to use
 citeproc_style = {'pdf': 'modern-humanities-research-association',
                   'html': 'modern-humanities-research-association'}
-
-# the fire-up address of the citeproc server
-citeproc_server = 'http://127.0.0.1:{0}'
-
-# citeproc startup delay
-citeproc_delay = 7
-
-# citeproc ports
-citeproc_ports = ['8085', '8086', '8087', '8088', '8089', '8090', '8091', '8092', '8093', '8094', '8095', '8096']

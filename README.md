@@ -52,9 +52,10 @@ The `fetch` mode pulls publication metadata from the remote repository (or the
 on-disk cache in `data/`, unless `--refresh` is given); the `make` mode builds
 the configured outputs from that cached data without touching the network.
 
-This tool currently requires a working copy of
-[citeproc-js-server](https://github.com/zotero/citeproc-js-server); point
-`citeproc_js_server_directory` in `config.py` at your checkout.
+Citations are formatted in-process with [citeproc-js](https://github.com/Juris-M/citeproc-js)
+(via `npm install`); the CSL style and locale are vendored in `static/csl`,
+so the build needs no external services and no network access beyond the
+initial metadata fetch. PDF generation is fully headless.
 
 # Development
 

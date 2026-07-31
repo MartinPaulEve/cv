@@ -179,6 +179,44 @@ class TestSectionFinalisation:
         )
 
 
+class TestSectionRendering:
+    def test_section_is_built_from_renderer_output(self, fake_config, logger):
+        """The builder converts repository items to CSL-JSON, formats them
+        through the injected renderer, and assembles the section: heading
+        with a count, one list entry per item, year shown once per group."""
+
+        class FakeRepo:
+            def __getattr__(self, name):
+                return [
+                    {"type": "book", "title": "First", "date": "2020-01-01",
+                     "uri": "https://repo.example/1"},
+                    {"type": "book", "title": "Second", "date": "2020-06-01",
+                     "uri": "https://repo.example/2"},
+                ]
+
+        class FakeRenderer:
+            def render(self, items, style):
+                assert style == "modern-humanities-research-association"
+                assert [i["type"] for i in items] == ["book", "book"]
+                return [
+                    f'<div class="csl-entry">{i["title"]}.</div>' for i in items
+                ]
+
+        processor = CiteProc(
+            repo=FakeRepo(), config=fake_config, logger=logger,
+            renderer=FakeRenderer(),
+        )
+        section = processor._eprint_substitute("books", "html")
+
+        assert "Books (2)" in section
+        assert "First." in section
+        assert "Second." in section
+        # both items are 2020: the year prefix appears exactly once
+        assert section.count(">2020</span>") == 1
+        # renderer divs become links to the items
+        assert 'href="https://repo.example/1"' in section
+
+
 class TestTemplateLoading:
     def test_template_contents_returned(self, processor, tmp_path):
         template = tmp_path / "tpl"

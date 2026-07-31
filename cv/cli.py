@@ -88,16 +88,11 @@ def main(argv=None):
     repo = Repository(config, logger, args["--refresh"])
     citeproc = CiteProc(repo, config, logger)
 
-    try:
-        if args["fetch"]:
-            types = args["TYPES"] if args["TYPES"] else config.default_types
-            repo.fetch(types)
-        elif args["make"]:
-            citeproc.start()
-            citeproc.build(args["OUTPUT_TYPES"])
-    finally:
-        # always try to shut down the citeproc server
-        citeproc.shutdown()
+    if args["fetch"]:
+        types = args["TYPES"] if args["TYPES"] else config.default_types
+        repo.fetch(types)
+    elif args["make"]:
+        citeproc.build(args["OUTPUT_TYPES"])
 
 
 def run():
