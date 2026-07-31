@@ -96,7 +96,14 @@ class Repository:
             # merge in any configured InvenioRDM repository (e.g. KC Works),
             # deduplicating by DOI with the eprints record preferred
             if getattr(self.config, "invenio", None):
-                invenio_items = InvenioSource(self.config, self.logger).fetch()
+                try:
+                    invenio_items = InvenioSource(
+                        self.config, self.logger
+                    ).fetch()
+                except requests.RequestException as exc:
+                    self.logger.error(f"Error fetching InvenioRDM data: {exc}")
+                    self._json_loaded = False
+                    return False
                 self.logger.info(
                     f"Merging {len(invenio_items)} InvenioRDM items "
                     f"with {len(records)} eprints items"

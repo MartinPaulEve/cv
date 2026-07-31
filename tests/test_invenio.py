@@ -102,6 +102,41 @@ CHAPTER_RECORD = {
     },
 }
 
+ZENODO_ARTICLE_RECORD = {
+    "id": "8434828",
+    "pids": {"doi": {"identifier": "10.5281/zenodo.8434828"}},
+    "access": {"status": "open"},
+    "links": {
+        "self_html": "https://zenodo.org/records/8434828",
+        "files": "https://zenodo.org/api/records/8434828/files",
+    },
+    "files": {
+        "enabled": True,
+        "entries": {
+            "article manuscript.pdf": {
+                "key": "article manuscript.pdf",
+                "mimetype": "application/pdf",
+                "access": {"hidden": False},
+            }
+        },
+    },
+    "metadata": {
+        "resource_type": {"id": "publication-article"},
+        "title": "A Zenodo Article",
+        "publication_date": "2024-05-01",
+        "creators": [
+            {
+                "person_or_org": {
+                    "type": "personal",
+                    "name": "Doe, Jane",
+                    "given_name": "Jane",
+                    "family_name": "Doe",
+                }
+            }
+        ],
+    },
+}
+
 BLOG_RECORD = {
     "id": "zzzzz-00001",
     "pids": {},
@@ -172,6 +207,20 @@ class TestNormalisation:
 
     def test_unmapped_resource_type_is_skipped(self, source):
         assert source.normalise(BLOG_RECORD) is None
+
+    def test_zenodo_inveniordm_record_uses_portable_types_and_file_links(
+        self, source
+    ):
+        item = source.normalise(ZENODO_ARTICLE_RECORD)
+
+        assert item["type"] == "article"
+        assert item["uri"] == "https://zenodo.org/records/8434828"
+        assert item["documents"] == [
+            {
+                "uri": "https://zenodo.org/api/records/8434828/files/"
+                "article%20manuscript.pdf/content"
+            }
+        ]
 
 
 class TestFetching:
@@ -271,3 +320,28 @@ class TestFetching:
             items = source.fetch()
 
         assert [i["type"] for i in items] == ["book"]
+
+    def test_search_requests_the_stable_inveniordm_representation(
+        self, source, fake_config
+    ):
+        fake_config.orcid = None
+        captured = {}
+
+        def fake_get(url, **kwargs):
+            captured.update(kwargs)
+
+            class Response:
+                def json(self):
+                    return {"hits": {"hits": []}, "links": {}}
+
+                def raise_for_status(self):
+                    pass
+
+            return Response()
+
+        with patch("cv.invenio.requests.get", side_effect=fake_get):
+            source.fetch()
+
+        assert captured["headers"]["Accept"] == (
+            "application/vnd.inveniordm.v1+json"
+        )

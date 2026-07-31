@@ -64,7 +64,7 @@ def record_dois(record):
     if _DOI_URL_PATTERN.match(official_url):
         dois.add(normalise_doi(official_url))
 
-    return dois
+    return {doi for doi in dois if doi}
 
 
 def _title_key(record):
@@ -105,10 +105,20 @@ def merge_records(primary, secondary):
         index(record)
 
     for record in secondary:
+        record_doi_values = record_dois(record)
         doi_matches = [
-            by_doi[doi] for doi in record_dois(record) if doi in by_doi
+            by_doi[doi] for doi in record_doi_values if doi in by_doi
         ]
         title_match = by_title.get(_title_key(record))
+
+        # Title matching exists for records that lack a DOI. Two records
+        # carrying different DOIs are distinct even when their titles match.
+        if (
+            title_match is not None
+            and record_doi_values
+            and record_dois(title_match)
+        ):
+            title_match = None
 
         target = doi_matches[0] if doi_matches else title_match
 
@@ -118,6 +128,7 @@ def merge_records(primary, secondary):
             for key, value in record.items():
                 if key not in target:
                     target[key] = value
+            index(target)
         else:
             copy = dict(record)
             merged.append(copy)

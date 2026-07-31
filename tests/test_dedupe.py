@@ -49,6 +49,9 @@ class TestRecordDois:
         record = {"official_url": "https://publisher.example/book"}
         assert record_dois(record) == set()
 
+    def test_blank_doi_values_are_ignored(self):
+        assert record_dois({"doi": "  ", "alternate_dois": [""]}) == set()
+
 
 class TestMerging:
     def test_shared_doi_yields_one_record_based_on_primary(self):
@@ -164,3 +167,27 @@ class TestMerging:
 
         assert len(merged) == 1
         assert merged[0]["publisher"] == "P"
+
+    def test_same_title_with_distinct_dois_remains_distinct(self):
+        primary = [
+            {"title": "Editorial", "type": "article", "doi": "10.1/first"}
+        ]
+        secondary = [
+            {"title": "Editorial", "type": "article", "doi": "10.1/second"}
+        ]
+
+        assert len(merge_records(primary, secondary)) == 2
+
+    def test_newly_merged_alternate_doi_is_used_for_later_matches(self):
+        primary = [{"title": "Primary", "type": "book", "doi": "10.1/a"}]
+        secondary = [
+            {
+                "title": "Repository copy",
+                "type": "book",
+                "doi": "10.1/a",
+                "alternate_dois": ["10.1/a", "10.1/b"],
+            },
+            {"title": "Third copy", "type": "book", "doi": "10.1/b"},
+        ]
+
+        assert len(merge_records(primary, secondary)) == 1

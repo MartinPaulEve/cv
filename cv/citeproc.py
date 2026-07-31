@@ -240,17 +240,22 @@ class CiteProc:
                         )
                     elif "documents" in item:
                         if len(item["documents"]) > 1:
-                            for doc in item["documents"]:
+                            link_template = oa_status
+                            links = []
+                            for document in item["documents"]:
                                 doc_label = (
-                                    " " + doc["formatdesc"]
-                                    if "formatdesc" in doc
+                                    " " + document["formatdesc"]
+                                    if "formatdesc" in document
                                     else ""
                                 )
-                                oa_status = (
-                                    oa_status.replace("[[oa_uri]]", doc["uri"])
+                                links.append(
+                                    link_template.replace(
+                                        "[[oa_uri]]", document["uri"]
+                                    )
                                     .replace("[[oa_color]]", oa_color)
                                     .replace("[[doc]]", doc_label)
                                 )
+                            oa_status = "".join(links)
                         else:
                             oa_status = (
                                 oa_status.replace(

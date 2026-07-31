@@ -12,6 +12,8 @@ records imported from legacy systems often lack ORCIDs, while a name
 match can miss variant forms — so the union is the safest net.
 """
 
+from urllib.parse import quote, urljoin
+
 import requests
 
 # how InvenioRDM resource types map onto the internal eprints-style types;
@@ -26,6 +28,10 @@ DEFAULT_TYPE_MAP = {
     "textDocument-bookChapter": "book_section",
     "presentation-conferencePaper": "conference_item",
     "presentation-conferencePresentation": "conference_item",
+    "publication-article": "article",
+    "publication-book": "book",
+    "publication-section": "book_section",
+    "publication-conferencepaper": "conference_item",
 }
 
 # resource types whose items count as peer-reviewed in the absence of any
@@ -38,9 +44,14 @@ REFEREED_TYPES = {
     "textDocument-bookChapter",
     "presentation-conferencePaper",
     "presentation-conferencePresentation",
+    "publication-article",
+    "publication-book",
+    "publication-section",
+    "publication-conferencepaper",
 }
 
 PAGE_SIZE = 100
+INVENIO_MEDIA_TYPE = "application/vnd.inveniordm.v1+json"
 
 
 class InvenioSource:
@@ -95,7 +106,10 @@ class InvenioSource:
     def _search(self, query):
         """Yield every record matching a query, following pagination."""
         response = requests.get(
-            self.api, params={"q": query, "size": PAGE_SIZE}, timeout=60
+            self.api,
+            params={"q": query, "size": PAGE_SIZE},
+            headers={"Accept": INVENIO_MEDIA_TYPE},
+            timeout=60,
         )
 
         while True:
@@ -108,7 +122,11 @@ class InvenioSource:
             if not next_url:
                 break
 
-            response = requests.get(next_url, timeout=60)
+            response = requests.get(
+                urljoin(self.api, next_url),
+                headers={"Accept": INVENIO_MEDIA_TYPE},
+                timeout=60,
+            )
 
     def normalise(self, record):
         """
@@ -155,6 +173,8 @@ class InvenioSource:
 
     def _landing_page(self, record):
         """The human-facing record page, derived from the API base."""
+        if record.get("links", {}).get("self_html"):
+            return record["links"]["self_html"]
         base = self.api.split("/api/")[0]
         return f"{base}/records/{record['id']}"
 
@@ -209,11 +229,19 @@ class InvenioSource:
 
         entries = record.get("files", {}).get("entries", {})
 
-        documents = [
-            {"uri": entry["links"]["content"]}
-            for entry in entries.values()
-            if entry.get("links", {}).get("content")
-        ]
+        documents = []
+        files_url = record.get("links", {}).get("files")
+        for key, entry in entries.items():
+            if entry.get("access", {}).get("hidden"):
+                continue
+
+            content_url = entry.get("links", {}).get("content")
+            if not content_url and files_url:
+                filename = entry.get("key", key)
+                content_url = f"{files_url.rstrip('/')}/{quote(filename)}/content"
+
+            if content_url:
+                documents.append({"uri": urljoin(self.api, content_url)})
 
         if documents:
             item["oa_status"] = "green"

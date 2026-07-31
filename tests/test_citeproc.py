@@ -68,6 +68,23 @@ class TestOpenAccessStatus:
     def test_rule_without_oa_config_is_empty(self, processor):
         assert processor._build_oa_status({"title": "x"}, "pdf") == ""
 
+    def test_each_open_document_gets_its_own_link(self, processor):
+        item = {
+            "title": "x",
+            "oa_status": "green",
+            "documents": [
+                {"uri": "https://repo.example/one", "formatdesc": "Accepted"},
+                {"uri": "https://repo.example/two", "formatdesc": "Published"},
+            ],
+        }
+
+        status = processor._build_oa_status(item, "html")
+
+        assert 'href="https://repo.example/one"' in status
+        assert 'href="https://repo.example/two"' in status
+        assert "Accepted" in status
+        assert "Published" in status
+
     def test_download_link_names_its_target(self, processor):
         """WCAG 2.4.9: the link's accessible name must identify its target,
         as plain text even when the title carries markup."""

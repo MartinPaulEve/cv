@@ -250,6 +250,32 @@ class TestMultiSourceFetch:
         with open(fake_config.storage["json"]) as cached:
             assert json.load(cached) == repo.json
 
+    def test_invenio_failure_does_not_replace_the_complete_cache(
+        self, fake_config, logger
+    ):
+        fake_config.invenio = {"api": "https://works.example.org/api/records"}
+        previous = [{"type": "book", "title": "Complete cached data"}]
+        with open(fake_config.storage["json"], "w") as cached:
+            json.dump(previous, cached)
+
+        class FailingInvenioSource:
+            def __init__(self, config, logger):
+                pass
+
+            def fetch(self):
+                raise requests.RequestException("secondary unavailable")
+
+        repo = Repository(fake_config, logger, refresh=True)
+        with (
+            patch("cv.repository.requests.get") as mock_get,
+            patch("cv.repository.InvenioSource", FailingInvenioSource),
+        ):
+            mock_get.return_value.text = "[]"
+            assert repo._populate_json(refresh=True) is False
+
+        with open(fake_config.storage["json"]) as cached:
+            assert json.load(cached) == previous
+
 
 class TestFetchPipeline:
     def test_fetch_writes_classified_sections_to_disk(self, repo, fake_config):
