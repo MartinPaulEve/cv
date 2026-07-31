@@ -6,6 +6,7 @@ together with static section files and template documents — into the
 final HTML outputs.
 """
 
+import html
 import os
 import re
 import subprocess
@@ -13,6 +14,7 @@ from contextlib import suppress
 from datetime import datetime
 
 from cv.accessibility import strip_markup
+from cv.configuration import PROJECT_ROOT
 from cv.renderer import CitationRenderer
 
 # fallback open access colours, used when a configuration predates the
@@ -57,6 +59,7 @@ class CiteProc:
                 return False
 
             try:
+                os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
                 with open(output_file, "w") as out_file:
                     out_file.write(template)
             except OSError:
@@ -68,7 +71,14 @@ class CiteProc:
             # run any post-processing shell commands in the ruleset
             for shell_script in ruleset[2:]:
                 self.logger.debug(f"Calling shell script {shell_script}")
-                subprocess.call(shell_script, shell=True)
+                return_code = subprocess.call(
+                    shell_script,
+                    shell=True,
+                    cwd=getattr(self.config, "project_root", str(PROJECT_ROOT)),
+                )
+                if return_code != 0:
+                    self.logger.error(f"Post-processing failed: {shell_script}")
+                    return False
         return True
 
     def _load_template(self, template):
@@ -101,7 +111,9 @@ class CiteProc:
                 substitute = self._eprint_substitute(match, rule)
             elif match.startswith("config:"):
                 # transclude a configuration value, e.g. {{config:user}}
-                substitute = getattr(self.config, match.split(":", 1)[1])
+                substitute = html.escape(
+                    str(getattr(self.config, match.split(":", 1)[1])), quote=True
+                )
             elif match.startswith("external:"):
                 # run an external command that yields a section into a file
                 # these should be in the format:
@@ -114,7 +126,11 @@ class CiteProc:
                     substitute = external_file.read()
             else:
                 try:
-                    section_file = "sections/" + match
+                    section_file = os.path.join(
+                        getattr(self.config, "project_root", str(PROJECT_ROOT)),
+                        "sections",
+                        match,
+                    )
                     with open(section_file) as section_input:
                         content = [line.rstrip("\n") for line in section_input]
                         substitute = "\n".join(content)
@@ -122,7 +138,10 @@ class CiteProc:
                     self.logger.error("Cannot load section.")
                     return False
 
-            template = section.sub(str(substitute), template)
+            template = section.sub(
+                lambda _match, value=str(substitute): value,
+                template,
+            )
 
         return template
 

@@ -7,9 +7,13 @@ names are converted to the eprints escaped person-identifier format so
 that nobody has to write 'Eve=3AMartin_Paul=3A=3A' by hand again.
 """
 
+from pathlib import Path
+
 import pytest
 
 from cv.configuration import encode_eprints_user, load_config, resolve_config_path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 @pytest.fixture
@@ -39,6 +43,14 @@ class TestPathResolution:
         with pytest.raises(FileNotFoundError, match="nonexistent"):
             resolve_config_path("nonexistent", config_dir=str(config_dir))
 
+    def test_default_config_directory_is_independent_of_cwd(
+        self, tmp_path, monkeypatch
+    ):
+        monkeypatch.chdir(tmp_path)
+        assert resolve_config_path("martin_paul_eve") == str(
+            PROJECT_ROOT / "config" / "martin_paul_eve.py"
+        )
+
 
 class TestLoading:
     def test_loaded_config_exposes_its_variables(self, config_dir):
@@ -53,6 +65,38 @@ class TestLoading:
 
         assert first.user == "Jane Doe"
         assert second.user == "Someone Else"
+
+    def test_profiles_receive_distinct_cache_and_output_paths(self, config_dir):
+        common = (
+            'storage = {"json": "data/eprints.json"}\n'
+            'output_rules = {"html": ["templates/HTML", "output/CV.html"]}\n'
+            'csl_directory = "static/csl"\n'
+        )
+        (config_dir / "jane_doe.py").write_text('user = "Jane Doe"\n' + common)
+        (config_dir / "john_doe.py").write_text('user = "John Doe"\n' + common)
+
+        jane = load_config(str(config_dir / "jane_doe.py"))
+        john = load_config(str(config_dir / "john_doe.py"))
+
+        assert jane.storage["json"] != john.storage["json"]
+        assert jane.output_rules["html"][1] != john.output_rules["html"][1]
+        assert "jane_doe" in jane.storage["json"]
+        assert "john_doe" in john.output_rules["html"][1]
+
+    def test_relative_project_paths_are_anchored(self, config_dir):
+        config_file = config_dir / "jane_doe.py"
+        config_file.write_text(
+            'user = "Jane Doe"\n'
+            'storage = {"json": "data/eprints.json"}\n'
+            'output_rules = {"html": ["templates/HTML", "output/CV.html"]}\n'
+            'csl_directory = "static/csl"\n'
+        )
+
+        config = load_config(str(config_file))
+
+        assert Path(config.storage["json"]).is_absolute()
+        assert Path(config.output_rules["html"][0]) == PROJECT_ROOT / "templates/HTML"
+        assert Path(config.csl_directory) == PROJECT_ROOT / "static/csl"
 
 
 class TestEprintsUserEncoding:

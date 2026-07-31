@@ -6,6 +6,8 @@ access status links, and creator/editor mapping. No citeproc server is
 involved anywhere here.
 """
 
+from unittest.mock import patch
+
 import pytest
 
 from cv.citeproc import CiteProc
@@ -226,6 +228,17 @@ class TestConfigTransclusion:
             "<title>Jane Doe: Curriculum Vitae</title>"
         )
 
+    def test_config_values_are_html_escaped_and_replaced_literally(
+        self, processor, fake_config
+    ):
+        fake_config.user = 'Jane "JJ" & Doe <\\1>'
+        template = '<meta name="description" content="CV of {{config:user}}">'
+
+        assert processor._substitute_template(template, "html") == (
+            '<meta name="description" '
+            'content="CV of Jane &quot;JJ&quot; &amp; Doe &lt;\\1&gt;">'
+        )
+
 
 class TestTemplateLoading:
     def test_template_contents_returned(self, processor, tmp_path):
@@ -235,6 +248,37 @@ class TestTemplateLoading:
 
     def test_missing_template_returns_none(self, processor):
         assert processor._load_template("/nonexistent/template") is None
+
+
+class TestCompleteBuild:
+    def test_build_writes_fully_substituted_output(
+        self, fake_config, logger, tmp_path
+    ):
+        template = tmp_path / "template.html"
+        destination = tmp_path / "nested" / "cv.html"
+        template.write_text("<title>{{config:user}}</title>")
+        fake_config.output_rules = {
+            "html": [str(template), str(destination)],
+        }
+
+        processor = CiteProc(repo=None, config=fake_config, logger=logger)
+
+        assert processor.build(["html"]) is True
+        assert destination.read_text() == "<title>Jane Doe</title>"
+
+    def test_failed_post_processing_fails_the_build(
+        self, fake_config, logger, tmp_path
+    ):
+        template = tmp_path / "template.html"
+        destination = tmp_path / "cv.html"
+        template.write_text("<title>{{config:user}}</title>")
+        fake_config.output_rules = {
+            "html": [str(template), str(destination), "false"],
+        }
+        processor = CiteProc(repo=None, config=fake_config, logger=logger)
+
+        with patch("cv.citeproc.subprocess.call", return_value=1):
+            assert processor.build(["html"]) is False
 
 
 class TestPeopleMapping:

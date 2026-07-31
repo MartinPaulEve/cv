@@ -77,7 +77,8 @@ def main(argv=None):
     logger.info(app)
 
     config = load_config(resolve_config_path(args["CONFIG"]))
-    logger.info(f"Building for {config.user}")
+    display_name = getattr(config, "user", config.eprints.get("user", "scholar"))
+    logger.info(f"Building for {display_name}")
 
     repo = Repository(config, logger, args["--refresh"])
     citeproc = CiteProc(repo, config, logger)

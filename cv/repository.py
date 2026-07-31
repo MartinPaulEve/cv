@@ -63,9 +63,10 @@ class Repository:
 
         # a pre-encoded eprints user in the config wins; otherwise the
         # identifier is derived from the plaintext user name
-        user = self.config.eprints.get(
-            "user", encode_eprints_user(self.config.user)
-        )
+        if "user" in self.config.eprints:
+            user = self.config.eprints["user"]
+        else:
+            user = encode_eprints_user(self.config.user)
         url = f"{repo}cgi/exportview/people/{user}/JSON/{user}.js"
 
         self.logger.debug(f"Built repository URL as: {url}")
@@ -105,6 +106,7 @@ class Repository:
             temp_path = None
             try:
                 destination = self.config.storage["json"]
+                os.makedirs(os.path.dirname(destination) or ".", exist_ok=True)
                 with tempfile.NamedTemporaryFile(
                     "w",
                     dir=os.path.dirname(destination) or ".",
@@ -170,7 +172,9 @@ class Repository:
                 f"Writing {output_type} to {self.config.storage[output_type]}"
             )
             try:
-                with open(self.config.storage[output_type], "w") as json_out_file:
+                destination = self.config.storage[output_type]
+                os.makedirs(os.path.dirname(destination) or ".", exist_ok=True)
+                with open(destination, "w") as json_out_file:
                     for output in output_list:
                         json_out_file.write(json.dumps(output) + "\n")
             except OSError:

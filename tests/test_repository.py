@@ -8,6 +8,7 @@ is mocked.
 
 import json
 import os
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -70,6 +71,16 @@ class TestUrlBuilding:
         fake_config.eprints["user"] = "Custom=3APerson=3A=3A"
         repo = Repository(fake_config, logger, refresh=False)
         assert "Custom=3APerson=3A=3A" in repo.url
+
+    def test_legacy_pre_encoded_user_does_not_require_plaintext_user(
+        self, fake_config, logger
+    ):
+        del fake_config.user
+        fake_config.eprints["user"] = "Legacy=3APerson=3A=3A"
+
+        repo = Repository(fake_config, logger, refresh=False)
+
+        assert "Legacy=3APerson=3A=3A" in repo.url
 
 
 class TestFilters:
@@ -176,6 +187,19 @@ class TestJsonCaching:
 
         with open(fake_config.storage["json"]) as cached:
             assert json.load(cached) == previous
+
+    def test_fetch_creates_a_profile_cache_directory(self, repo, fake_config):
+        fake_config.storage["json"] = str(
+            Path(fake_config.storage["json"]).parent
+            / "jane_doe"
+            / "eprints.json"
+        )
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = "[]"
+            assert repo._populate_json(refresh=True) is True
+
+        assert os.path.isfile(fake_config.storage["json"])
 
 
 class TestMultiSourceFetch:

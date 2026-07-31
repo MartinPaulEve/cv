@@ -11,7 +11,8 @@ import json
 import os
 import subprocess
 
-RENDER_SCRIPT = os.path.join("scripts", "render-citations.js")
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+RENDER_SCRIPT = os.path.join(PROJECT_ROOT, "scripts", "render-citations.js")
 
 
 class CitationRenderer:

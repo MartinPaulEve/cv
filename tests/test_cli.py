@@ -77,3 +77,12 @@ def test_failed_build_returns_nonzero_status(doubles):
     citeproc.build.return_value = False
 
     assert cli.main(["make", "jane_doe", "html"]) == 1
+
+
+def test_legacy_config_uses_pre_encoded_user_as_display_name(doubles, fake_config):
+    repo, _, _ = doubles
+    repo.fetch.return_value = True
+    del fake_config.user
+    fake_config.eprints["user"] = "Legacy=3APerson=3A=3A"
+
+    assert cli.main(["fetch", "legacy"]) == 0
