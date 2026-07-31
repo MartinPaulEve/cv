@@ -1,10 +1,12 @@
 <div class="section" id="infotech">
 	<h2 class="sectionheader">INFORMATION TECHNOLOGY</h2>
 	<p>Extensive technological experience, including WordPress/BuddyPress plug-ins and themes, SQL databases (MySQL and Postgres), AWS cloud provisioning, LAMP, LEMP, LAPP, and Traefik-based stacks, REST API frameworks, ElasticSearch, CI/CD setup and maintenance, Git versioning (and GitHub hosting), unit testing, Rust, Python, Django, Flask, C#, JavaScript, Java, ASP.NET, Terraform (AWS), XHTML, XML, XSLT, HTMX and more.</p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2022</span><span class="bibitem">AWS Certified Cloud Practitioner</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2007</span><span class="bibitem">Microsoft Certified Professional  – C# and the .NET Framework</span></p>
-	<p class="anitemn genericitem"><span class="prefix bold"></span><span class="bibitem">Proficient in:  Python, Django, PHP, ASP.NET, SQL, Terraform (AWS cloud), XHTML, *nix/BSD-variant (including LAMP-stack) system administration, XML, XSLT</span></p>
-	<p class="anitemn genericitem"><span class="prefix bold"></span><span class="bibitem">SQL experience with Postgres, MySQL, and SQLite</span></p>
-	<p class="anitemn genericitem"><span class="prefix bold"></span><span class="bibitem">XML and XSLT experience, particularly with JATS and BITS</span></p>
-	<p class="anitemn genericitem"><span class="prefix bold"></span><span class="bibitem">Extensive technical project management experience: founded Janeway and the Open Library of Humanities</span></p>
+	<ul class="publist">
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2022</span><span class="bibitem">AWS Certified Cloud Practitioner</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2007</span><span class="bibitem">Microsoft Certified Professional  – C# and the .NET Framework</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true"></span><span class="bibitem">Proficient in:  Python, Django, PHP, ASP.NET, SQL, Terraform (AWS cloud), XHTML, *nix/BSD-variant (including LAMP-stack) system administration, XML, XSLT</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true"></span><span class="bibitem">SQL experience with Postgres, MySQL, and SQLite</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true"></span><span class="bibitem">XML and XSLT experience, particularly with JATS and BITS</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true"></span><span class="bibitem">Extensive technical project management experience: founded Janeway and the Open Library of Humanities</span></li>
+	</ul>
 </div>

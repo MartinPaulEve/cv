@@ -2,18 +2,22 @@
 <h2 class="sectionheader">Ph.D. SUPERVISION</h2>
 <h3>CURRENT STUDENTS</h3>
 
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Manal Altammami on digital approaches to Mark Twain</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Marsha Courneya on new equitable techno-economic models for creative industries</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Nivedita Nair on irony in contemporary culture</span></p>
+	<ul class="publist">
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Manal Altammami on digital approaches to Mark Twain</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Marsha Courneya on new equitable techno-economic models for creative industries</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Nivedita Nair on irony in contemporary culture</span></li>
+	</ul>
 
 
 <h3>FORMER STUDENTS</h3>
 	<p class="anitemmewdate genericitem"><span class="prefix bold">2025</span><span class="bibitem">Dr Lance Eaton: ‘<a href="https://scholarworks.umb.edu/doctoral_dissertations/1058/">Elbow Patches To Eye Patches: A Phenomenographic Study Of Scholarly Practices, Research Literature Access, And Academic Piracy</a>’</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2023</span><span class="bibitem">Dr Serena Ceniccola: ‘<a href="https://eprints.bbk.ac.uk/id/eprint/54447/">Nanigo de kangateiru ka": A Comparative Study on Multilingualism, Loneliness and Hybridity in Japanese Contemporary Literature and Literary-Adjacent Media</a>’</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2022</span><span class="bibitem">Dr Erin Reilly: ‘Towards an Ethical Culture: American Mythologies and the Limits of Freedom in the Work of David Foster Wallace’</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">Dr Bronaċ Ferran: ‘Hansjörg Mayer’s Autopoetics of the 1960s’</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">Dr Raphael Kabo: ‘Imagining the End of Capitalism: Utopia and the Commons in Contemporary Literature’</span></p>
-	<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">Dr Erik Ketzan: ‘Groundwork: Digital Approaches to Changes in Thomas Pynchon’s Style’</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Dr Stuart Lawson: ‘<a href="https://ethos.bl.uk/OrderDetails.do?uin=uk.bl.ethos.774255">Open Access Policy in the UK: From Neoliberalism to the Commons</a>’</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2018</span><span class="bibitem">Dr Andrew Rowcroft: ‘<a href="https://ethos.bl.uk/OrderDetails.do?did=1&uin=uk.bl.ethos.762679">After Post-Marxism: The Recuperation and Regeneration of Marxism in Contemporary British and American Fiction</a>’</span></p>
+	<ul class="publist">
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2023</span><span class="bibitem">Dr Serena Ceniccola: ‘<a href="https://eprints.bbk.ac.uk/id/eprint/54447/">Nanigo de kangateiru ka": A Comparative Study on Multilingualism, Loneliness and Hybridity in Japanese Contemporary Literature and Literary-Adjacent Media</a>’</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2022</span><span class="bibitem">Dr Erin Reilly: ‘Towards an Ethical Culture: American Mythologies and the Limits of Freedom in the Work of David Foster Wallace’</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">Dr Bronaċ Ferran: ‘Hansjörg Mayer’s Autopoetics of the 1960s’</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">Dr Raphael Kabo: ‘Imagining the End of Capitalism: Utopia and the Commons in Contemporary Literature’</span></li>
+		<li class="anitem genericitem"><span class="prefix" aria-hidden="true">&nbsp;</span><span class="bibitem">Dr Erik Ketzan: ‘Groundwork: Digital Approaches to Changes in Thomas Pynchon’s Style’</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Dr Stuart Lawson: ‘<a href="https://ethos.bl.uk/OrderDetails.do?uin=uk.bl.ethos.774255">Open Access Policy in the UK: From Neoliberalism to the Commons</a>’</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2018</span><span class="bibitem">Dr Andrew Rowcroft: ‘<a href="https://ethos.bl.uk/OrderDetails.do?did=1&uin=uk.bl.ethos.762679">After Post-Marxism: The Recuperation and Regeneration of Marxism in Contemporary British and American Fiction</a>’</span></li>
+	</ul>
 </div>

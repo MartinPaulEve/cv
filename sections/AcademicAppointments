@@ -1,23 +1,33 @@
 <div class="section" id="acad">
   <h2 class="sectionheader">APPOINTMENTS</h2>
-  <p class="bold nobottom"><span class="prefix">01/2025</span> Technical Lead, Knowledge Commons</p>
-  <p class="notop"><span class="prefix bold">- present</span> Michigan State University</p>
-  
-  <p class="bold nobottom"><span class="prefix">10/2016</span> Professor of Literature, Technology and Publishing</p>
-  <p class="notop"><span class="prefix bold">- present</span> Birkbeck, University of London</p>
-
-  <p class="bold nobottom"><span class="prefix">01/2023</span> Principal R&D Developer</p>
-  <p class="notop"><span class="prefix bold">- 11/2024</span> Crossref</p>
-
-  <p class="bold nobottom"><span class="prefix">04/2019</span> Visiting Professor of Digital Humanities</p>
-  <p class="notop"><span class="prefix bold">- 04/2022</span> Sheffield Hallam University</p>
-
-  <p class="bold nobottom"><span class="prefix">05/2015</span> Senior Lecturer in Literature, Technology and Publishing</p>
-  <p class="notop"><span class="prefix bold">- 09/2016</span> Birkbeck, University of London</span></p>
-
-  <p class="bold nobottom"><span class="prefix">01/2013</span> Lecturer in English Literature</p>
-  <p class="notop"><span class="prefix bold">- 04/2015</span> University of Lincoln</span></p>
-
-  <p class="bold nobottom"><span class="prefix">10/2010</span> Associate Lecturer and Tutor (part-time)</p>
-  <p class="notop"><span class="prefix bold">- 12/2012</span> University of Sussex</span></p>
+  <ul class="publist">
+    <li>
+      <p class="bold nobottom"><span class="prefix">01/2025</span> Technical Lead, Knowledge Commons</p>
+      <p class="notop"><span class="prefix bold">- present</span> Michigan State University</p>
+    </li>
+    <li>
+      <p class="bold nobottom"><span class="prefix">10/2016</span> Professor of Literature, Technology and Publishing</p>
+      <p class="notop"><span class="prefix bold">- present</span> Birkbeck, University of London</p>
+    </li>
+    <li>
+      <p class="bold nobottom"><span class="prefix">01/2023</span> Principal R&amp;D Developer</p>
+      <p class="notop"><span class="prefix bold">- 11/2024</span> Crossref</p>
+    </li>
+    <li>
+      <p class="bold nobottom"><span class="prefix">04/2019</span> Visiting Professor of Digital Humanities</p>
+      <p class="notop"><span class="prefix bold">- 04/2022</span> Sheffield Hallam University</p>
+    </li>
+    <li>
+      <p class="bold nobottom"><span class="prefix">05/2015</span> Senior Lecturer in Literature, Technology and Publishing</p>
+      <p class="notop"><span class="prefix bold">- 09/2016</span> Birkbeck, University of London</p>
+    </li>
+    <li>
+      <p class="bold nobottom"><span class="prefix">01/2013</span> Lecturer in English Literature</p>
+      <p class="notop"><span class="prefix bold">- 04/2015</span> University of Lincoln</p>
+    </li>
+    <li>
+      <p class="bold nobottom"><span class="prefix">10/2010</span> Associate Lecturer and Tutor (part-time)</p>
+      <p class="notop"><span class="prefix bold">- 12/2012</span> University of Sussex</p>
+    </li>
+  </ul>
 </div>

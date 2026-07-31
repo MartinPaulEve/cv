@@ -1,61 +1,65 @@
 <div class="section" id="extexam">
 	<h2 class="sectionheader">EXTERNAL EXAMINATIONS</h2>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2026</span><span class="bibitem">Dublin City University, Ed.D. Examination</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2025</span><span class="bibitem">University of Brighton, Ph.D. Examination (English literature)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2024</span><span class="bibitem">University of Massachusetts, Boston, Ph.D. dissertation committee (Higher Education)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2022-2025</span><span class="bibitem">University of Cambridge, MPhil Degree Programme</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">University of Sheffield, Ph.D. Examination (library and information science)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">University of Nottingham, Ph.D. Examination (English literature)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">University of Leeds, Ph.D. Examination (English literature)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">University of Southampton, Ph.D. Examination (computer science)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;-2021</span><span class="bibitem">Manchester Metropolitan University, MA English Studies</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Loughborough University, BA English Literature, BA English with Digital Humanities, and BA English and American Studies Undergraduate degree programme (until 2022)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2018-2020</span><span class="bibitem">Kingston University, MA Literature and Philosophy</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Loughborough, Ph.D. Examination (library and information studies)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;-2021</span><span class="bibitem">University of Leicester, MA in Modern Literature</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">University of Birmingham, Ph.D. Examination (English literature)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Royal Holloway, University of London, Ph.D. Examination (English literature)</span></p>
+	<ul class="publist">
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2026</span><span class="bibitem">Dublin City University, Ed.D. Examination</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2025</span><span class="bibitem">University of Brighton, Ph.D. Examination (English literature)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2024</span><span class="bibitem">University of Massachusetts, Boston, Ph.D. dissertation committee (Higher Education)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2022-2025</span><span class="bibitem">University of Cambridge, MPhil Degree Programme</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">University of Sheffield, Ph.D. Examination (library and information science)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">University of Nottingham, Ph.D. Examination (English literature)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Leeds, Ph.D. Examination (English literature)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Southampton, Ph.D. Examination (computer science)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold">&nbsp;-2021</span><span class="bibitem">Manchester Metropolitan University, MA English Studies</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Loughborough University, BA English Literature, BA English with Digital Humanities, and BA English and American Studies Undergraduate degree programme (until 2022)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2018-2020</span><span class="bibitem">Kingston University, MA Literature and Philosophy</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Loughborough, Ph.D. Examination (library and information studies)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold">&nbsp;-2021</span><span class="bibitem">University of Leicester, MA in Modern Literature</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Birmingham, Ph.D. Examination (English literature)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Royal Holloway, University of London, Ph.D. Examination (English literature)</span></li>
+	</ul>
 </div>
 
 <div class="section" id="peereview">
 	<h2 class="sectionheader">PEER REVIEW / READER REPORTS</h2>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Arts and Humanities Research Council (academic and technical grant reviews)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>American Literary History</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">AMS Press (book reader reports)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>C21</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Chicago University Press (book reader reports)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>College Literature</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Comics Grid</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Contemporary Women's Writing</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Convergence</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Cultural Science</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Digital Scholarship in the Humanities</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>English: Journal of the English Association</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>European Journal of American Studies</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>European Journal of Social Theory</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Film-Philosophy</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Foucault Studies</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Frontiers in Digital Humanities</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>IJES: International Journal of English Studies</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Journal of Computational Literary Studies</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">The Leverhulme Trust, United Kingdom (grant reviews)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>LIBER Quarterly</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Literary and Linguistic Computing</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>MFS Modern Fiction Studies</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">MIT Press (book reader reports)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">National Sciences Center, Poland (grant reviews)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>New Americanist</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Online Information Review</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Oxford University Press</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>PLOS ONE</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Proceedings of the National Academy of Sciences of the United States of America (PNAS)</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Publishing Research Quarterly</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Netherlands Organisation for Health Research and Development (ZonMw) (grant reviews)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Routledge (book reader reports)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Science and Public Policy</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Studies in the Novel</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Symbiosis</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Textual Practice</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Twentieth-Century Literature</i></span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem"><i>Victorians: A Journal of Culture and Literature</i></span></p>
+	<ul class="publist">
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Arts and Humanities Research Council (academic and technical grant reviews)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>American Literary History</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">AMS Press (book reader reports)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>C21</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Chicago University Press (book reader reports)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>College Literature</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Comics Grid</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Contemporary Women's Writing</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Convergence</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Cultural Science</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Digital Scholarship in the Humanities</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>English: Journal of the English Association</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>European Journal of American Studies</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>European Journal of Social Theory</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Film-Philosophy</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Foucault Studies</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Frontiers in Digital Humanities</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>IJES: International Journal of English Studies</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Journal of Computational Literary Studies</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">The Leverhulme Trust, United Kingdom (grant reviews)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>LIBER Quarterly</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Literary and Linguistic Computing</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>MFS Modern Fiction Studies</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">MIT Press (book reader reports)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">National Sciences Center, Poland (grant reviews)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>New Americanist</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Online Information Review</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Oxford University Press</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>PLOS ONE</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Proceedings of the National Academy of Sciences of the United States of America (PNAS)</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Publishing Research Quarterly</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Netherlands Organisation for Health Research and Development (ZonMw) (grant reviews)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Routledge (book reader reports)</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Science and Public Policy</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Studies in the Novel</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Symbiosis</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Textual Practice</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Twentieth-Century Literature</i></span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem"><i>Victorians: A Journal of Culture and Literature</i></span></li>
+	</ul>
 </div>

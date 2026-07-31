@@ -1,10 +1,12 @@
 <div class="section" id="organization">
 	<h2 class="sectionheader">ACADEMIC ORGANISATION / COMMUNITY OUTREACH</h2>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Working Group Member – BOAI</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2015</span><span class="bibitem">Organizing Committee Member – OpenCon 2015</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2014</span><span class="bibitem">Conference Co-Organiser  – What Happens Now 2014 (University of Lincoln, July 2014)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2013</span><span class="bibitem">Conference Co-Organiser – International Pynchon Week 2013 (University of Durham, August 2013)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2012</span><span class="bibitem">Conference Co-Organiser – First Fictions (University of Sussex, 2012) – speakers included Ian Rankin, Bryan and Mary Talbot and Nicholas Royle. I was also responsible for web presence and budgeting for this conference for which we secured funding from Gylphi and Taylor & Francis</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2011</span><span class="bibitem">Lead Event Organizer – Pynchon in Public Day (2011) – I founded this international event celebrating the works of Thomas Pynchon (now recurring annually) which has since been covered in the Guardian, LA Times and New York Daily News newspapers</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Conference Co-Organiser – Picture This: Epistolary Writing Conference (University of Sussex, 2011) – I was responsible for web-presence, online e-submission of proposals and online payment</span></p>
+	<ul class="publist">
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Working Group Member – BOAI</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2015</span><span class="bibitem">Organizing Committee Member – OpenCon 2015</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2014</span><span class="bibitem">Conference Co-Organiser  – What Happens Now 2014 (University of Lincoln, July 2014)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2013</span><span class="bibitem">Conference Co-Organiser – International Pynchon Week 2013 (University of Durham, August 2013)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2012</span><span class="bibitem">Conference Co-Organiser – First Fictions (University of Sussex, 2012) – speakers included Ian Rankin, Bryan and Mary Talbot and Nicholas Royle. I was also responsible for web presence and budgeting for this conference for which we secured funding from Gylphi and Taylor & Francis</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2011</span><span class="bibitem">Lead Event Organizer – Pynchon in Public Day (2011) – I founded this international event celebrating the works of Thomas Pynchon (now recurring annually) which has since been covered in the Guardian, LA Times and New York Daily News newspapers</span></li>
+		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Conference Co-Organiser – Picture This: Epistolary Writing Conference (University of Sussex, 2011) – I was responsible for web-presence, online e-submission of proposals and online payment</span></li>
+	</ul>
 </div>
