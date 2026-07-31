@@ -421,8 +421,11 @@ class CiteProc:
         section_template,
     ):
         if item_count > 0:
+            heading_id = f"{section}-heading"
             header_output = header_template.format(
-                self.config.section_headings[rule][section], item_count
+                self.config.section_headings[rule][section],
+                item_count,
+                heading_id,
             )
 
             # publication runs are wrapped in a real list element so that
@@ -432,7 +435,7 @@ class CiteProc:
                 output_string = list_templates[rule].format(output_string)
 
             section_output = section_template.format(
-                section, header_output + output_string
+                section, header_output + output_string, heading_id
             )
         else:
             section_output = ""

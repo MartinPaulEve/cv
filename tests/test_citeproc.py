@@ -167,6 +167,19 @@ class TestItemTemplating:
 
 
 class TestSectionFinalisation:
+    def test_section_landmark_is_named_by_its_heading(self, processor):
+        section = processor._finalize_section(
+            header_template='<h3 id="{2}">{0} ({1})</h3>',
+            item_count=1,
+            output_string="<li>one</li>",
+            rule="html",
+            section="books",
+            section_template='<section id="{0}" aria-labelledby="{2}">{1}</section>',
+        )
+
+        assert 'id="books-heading"' in section
+        assert 'aria-labelledby="books-heading"' in section
+
     def test_items_are_wrapped_in_a_list(self, processor):
         """Publication runs must be real lists, not paragraph soup, so that
         assistive technology announces them as navigable lists."""

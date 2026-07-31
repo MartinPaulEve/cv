@@ -8,6 +8,8 @@ configuration, these tests fail rather than letting the output quietly
 regress below AAA.
 """
 
+from pathlib import Path
+
 import pytest
 
 from cv.accessibility import (
@@ -81,3 +83,11 @@ class TestConfiguredColoursMeetAaa:
             assert meets_aaa(colour), (
                 f"open access colour for {route} route fails AAA contrast"
             )
+
+
+class TestStaticSectionMarkup:
+    def test_static_list_items_are_list_elements(self):
+        postgrads = (
+            Path(__file__).parents[1] / "sections" / "Postgrads"
+        ).read_text()
+        assert '<p class="anitemmewdate genericitem">' not in postgrads

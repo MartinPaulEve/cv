@@ -2,10 +2,10 @@
  *
  * Two documents are checked:
  *
- *  1. output/Eve-CV.html — the HTML fragment that is transcluded into a
+ *  1. the configured HTML fragment that is transcluded into a
  *     website. It is wrapped in a minimal page scaffold here, because a
  *     fragment alone has no lang or title of its own to test.
- *  2. output/Eve-CV-PDF.html — the print source document. Paged.js is
+ *  2. the configured print source document. Paged.js is
  *     blocked during the check so that axe sees the semantic source
  *     rather than the paginated layout boxes.
  *
@@ -21,10 +21,36 @@ const AXE_PATH = require.resolve('axe-core/axe.min.js');
 const WCAG_TAGS = [
   'wcag2a', 'wcag2aa', 'wcag2aaa',
   'wcag21a', 'wcag21aa', 'wcag22a', 'wcag22aa',
+  'best-practice',
 ];
 
-const FRAGMENT = path.resolve(__dirname, '..', 'output', 'Eve-CV.html');
-const PDF_SOURCE = path.resolve(__dirname, '..', 'output', 'Eve-CV-PDF.html');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const FRAGMENT = path.resolve(
+  process.env.CV_ACCESSIBILITY_FRAGMENT ||
+  path.join(PROJECT_ROOT, 'output', 'martin_paul_eve-Eve-CV.html')
+);
+const PDF_SOURCE = path.resolve(
+  process.env.CV_ACCESSIBILITY_PDF_SOURCE ||
+  path.join(PROJECT_ROOT, 'output', 'martin_paul_eve-Eve-CV-PDF.html')
+);
+const PDF = path.resolve(
+  process.env.CV_ACCESSIBILITY_PDF ||
+  path.join(PROJECT_ROOT, 'output', 'martin_paul_eve-Eve-CV.pdf')
+);
+
+function checkPdfStructure(pdfPath) {
+  const contents = fs.readFileSync(pdfPath).toString('latin1');
+  const requiredMarkers = ['/StructTreeRoot', '/Marked true', '/Lang', '/Outlines'];
+  const missing = requiredMarkers.filter((marker) => !contents.includes(marker));
+
+  if (missing.length > 0) {
+    console.error(`PDF is missing accessibility structure: ${missing.join(', ')}`);
+    return 1;
+  }
+
+  console.log('PDF: tagged structure, language, and outline present');
+  return 0;
+}
 
 async function checkPage(browser, label, load) {
   const page = await browser.newPage();
@@ -55,6 +81,16 @@ async function checkPage(browser, label, load) {
 }
 
 (async () => {
+  const missing = [FRAGMENT, PDF_SOURCE, PDF].filter(
+    (artifact) => !fs.existsSync(artifact)
+  );
+  if (missing.length > 0) {
+    for (const artifact of missing) {
+      console.error(`Expected accessibility artifact is missing: ${artifact}`);
+    }
+    process.exit(1);
+  }
+
   // sandbox flags: see the note in print.js — only local generated
   // content is ever loaded
   const browser = await puppeteer.launch({
@@ -64,36 +100,33 @@ async function checkPage(browser, label, load) {
   let violations = 0;
 
   try {
-    if (fs.existsSync(FRAGMENT)) {
-      violations += await checkPage(browser, 'HTML fragment', async (page) => {
-        const fragment = fs.readFileSync(FRAGMENT, 'utf8');
-        const scaffold =
-          '<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">' +
-          '<title>Publications</title></head><body><h1>Publications</h1>' +
-          '<h2>Section scaffold</h2>' + fragment + '</body></html>';
-        await page.setContent(scaffold, { waitUntil: 'load' });
-      });
-    } else {
-      console.log('HTML fragment not present; skipping');
-    }
+    violations += await checkPage(browser, 'HTML fragment', async (page) => {
+      const fragment = fs.readFileSync(FRAGMENT, 'utf8');
+      const scaffold =
+        '<!DOCTYPE html><html lang="en-GB"><head><meta charset="utf-8">' +
+        '<title>Publications</title></head><body><main>' +
+        '<h1>Publications</h1><h2>Section scaffold</h2>' + fragment +
+        '</main></body></html>';
+      await page.setContent(scaffold, { waitUntil: 'load' });
+    });
 
-    if (fs.existsSync(PDF_SOURCE)) {
-      violations += await checkPage(browser, 'PDF source', async (page) => {
-        // block Paged.js and remote fonts so axe sees the source semantics
-        await page.setRequestInterception(true);
-        page.on('request', (request) => {
-          const url = request.url();
-          if (url.includes('pagedjs') || url.includes('typekit')) {
-            request.abort();
-          } else {
-            request.continue();
-          }
-        });
-        await page.goto('file://' + PDF_SOURCE, { waitUntil: 'load' });
+    violations += await checkPage(browser, 'PDF source', async (page) => {
+      // block Paged.js and remote fonts so axe sees the source semantics
+      // under the same white-page print styles used for PDF generation
+      await page.emulateMediaType('print');
+      await page.setRequestInterception(true);
+      page.on('request', (request) => {
+        const url = request.url();
+        if (url.includes('pagedjs') || url.includes('typekit')) {
+          request.abort();
+        } else {
+          request.continue();
+        }
       });
-    } else {
-      console.log('PDF source not present; skipping');
-    }
+      await page.goto('file://' + PDF_SOURCE, { waitUntil: 'load' });
+    });
+
+    violations += checkPdfStructure(PDF);
   } finally {
     await browser.close();
   }

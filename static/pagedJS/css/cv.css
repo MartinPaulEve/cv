@@ -54,6 +54,18 @@ html, body {
     margin-left: 1.05in;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 ul {
   list-style-type: none;
   list-style-position: inside;
@@ -115,8 +127,8 @@ sup {
 }
 
 a:link {
-  text-decoration: none;
-  color: #000;
+  text-decoration: underline;
+  color: #34539C;
 }
 
 h1, h2, h3, h4 {

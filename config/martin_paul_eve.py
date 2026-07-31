@@ -115,12 +115,13 @@ output_rules = {'html': ['templates/HTML',
 # define the section template
 # sections are semantic <section> landmarks so that assistive technology can
 # navigate between them
-section_template = {'pdf': '<section id="{0}">{1}</section>',
-                    'html': '<section id="{0}">{1}</section>'}
+section_template = {
+    'pdf': '<section id="{0}" aria-labelledby="{2}">{1}</section>',
+    'html': '<section id="{0}" aria-labelledby="{2}">{1}</section>'}
 
 # define the header template
-header_template = {'pdf': '<h2 class="sectionheader">{0} ({1})</h2>',
-                   'html': '<h3 class="sectionheader">{0} ({1})</h3>'}
+header_template = {'pdf': '<h2 id="{2}" class="sectionheader">{0} ({1})</h2>',
+                   'html': '<h3 id="{2}" class="sectionheader">{0} ({1})</h3>'}
 
 # define the list wrapper placed around the items of each publication section
 # (real lists are announced item-by-item by screen readers; the inline style

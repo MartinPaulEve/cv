@@ -7,14 +7,14 @@
 		<li class="anitemnewdate genericitem"><span class="prefix bold">2022-2025</span><span class="bibitem">University of Cambridge, MPhil Degree Programme</span></li>
 		<li class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">University of Sheffield, Ph.D. Examination (library and information science)</span></li>
 		<li class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">University of Nottingham, Ph.D. Examination (English literature)</span></li>
-		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Leeds, Ph.D. Examination (English literature)</span></li>
-		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Southampton, Ph.D. Examination (computer science)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2020: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Leeds, Ph.D. Examination (English literature)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2020: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Southampton, Ph.D. Examination (computer science)</span></li>
 		<li class="anitem genericitem"><span class="prefix bold">&nbsp;-2021</span><span class="bibitem">Manchester Metropolitan University, MA English Studies</span></li>
 		<li class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Loughborough University, BA English Literature, BA English with Digital Humanities, and BA English and American Studies Undergraduate degree programme (until 2022)</span></li>
 		<li class="anitemnewdate genericitem"><span class="prefix bold">2018-2020</span><span class="bibitem">Kingston University, MA Literature and Philosophy</span></li>
-		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Loughborough, Ph.D. Examination (library and information studies)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2018-2020: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Loughborough, Ph.D. Examination (library and information studies)</span></li>
 		<li class="anitem genericitem"><span class="prefix bold">&nbsp;-2021</span><span class="bibitem">University of Leicester, MA in Modern Literature</span></li>
-		<li class="anitem genericitem"><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Birmingham, Ph.D. Examination (English literature)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2018-2021: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">University of Birmingham, Ph.D. Examination (English literature)</span></li>
 		<li class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Royal Holloway, University of London, Ph.D. Examination (English literature)</span></li>
 	</ul>
 </div>

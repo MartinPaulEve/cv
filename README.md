@@ -7,14 +7,22 @@ results and deduplicating records that were deposited in more than one
 place (by DOI, with a title fallback for deposits that carry no DOI; the
 eprints record is preferred and its gaps are filled from the other copy).
 
-Both outputs are built for WCAG 2.2 AAA accessibility: semantic list
-structure, AAA contrast, accessible link names, and a tagged PDF with a
-document outline, produced fully headlessly. An axe-core gate
-(`npm run check-access`) verifies both generated documents.
+Both outputs are designed to support WCAG 2.2 AAA accessibility: semantic
+list and landmark structure, AAA contrast, accessible link names, and a
+tagged PDF with a document outline, produced fully headlessly. The axe-core
+gate (`npm run check-access`) checks the generated HTML documents for
+automatically detectable issues and verifies that the PDF contains tagging,
+language, and outline structures. Manual review remains necessary for WCAG
+criteria that cannot be automated.
 
-The project uses [uv](https://docs.astral.sh/uv/) for packaging and running.
-There is no separate installation step: `uv run` resolves and installs
-dependencies on first use.
+The project uses [uv](https://docs.astral.sh/uv/) for Python packaging and
+running, with npm for citeproc-js, PDF generation, and accessibility checks.
+Install both dependency sets before the first build:
+
+```
+uv sync
+npm ci
+```
 
 # Usage
 
@@ -73,7 +81,7 @@ on-disk cache in `data/`, unless `--refresh` is given); the `make` mode builds
 the configured outputs from that cached data without touching the network.
 
 Citations are formatted in-process with [citeproc-js](https://github.com/Juris-M/citeproc-js)
-(via `npm install`); the CSL style and locale are vendored in `static/csl`,
+(installed by `npm ci`); the CSL style and locale are vendored in `static/csl`,
 so the build needs no external services and no network access beyond the
 initial metadata fetch. PDF generation is fully headless.
 
@@ -84,4 +92,5 @@ Run the tests and the linter with:
 ```
 uv run pytest
 uv run ruff check cv tests
+npm test
 ```

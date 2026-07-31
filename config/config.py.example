@@ -136,12 +136,13 @@ output_rules = {'html': ['templates/HTML',
                         ]}
 
 # the wrapper placed around each generated section
-section_template = {'pdf': '<section id="{0}">{1}</section>',
-                    'html': '<section id="{0}">{1}</section>'}
+section_template = {
+    'pdf': '<section id="{0}" aria-labelledby="{2}">{1}</section>',
+    'html': '<section id="{0}" aria-labelledby="{2}">{1}</section>'}
 
 # the section heading, receiving the heading text and the item count
-header_template = {'pdf': '<h2 class="sectionheader">{0} ({1})</h2>',
-                   'html': '<h3 class="sectionheader">{0} ({1})</h3>'}
+header_template = {'pdf': '<h2 id="{2}" class="sectionheader">{0} ({1})</h2>',
+                   'html': '<h3 id="{2}" class="sectionheader">{0} ({1})</h3>'}
 
 # the list wrapper placed around the items of each publication section
 # (the inline style keeps the HTML fragment self-contained when it is

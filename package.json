@@ -2,7 +2,8 @@
   "description": "Node-side tooling for the cv generator: tagged PDF printing and accessibility checks",
   "scripts": {
     "print": "node ./print.js",
-    "check-access": "node ./scripts/check-accessibility.js"
+    "check-access": "node ./scripts/check-accessibility.js",
+    "test": "node ./tests-js/accessibility.test.js && node ./tests-js/renderer.test.js"
   },
   "dependencies": {
     "citeproc": "^2.4.63",
