@@ -1,6 +1,14 @@
 {
+  "description": "Node-side tooling for the cv generator: tagged PDF printing and accessibility checks",
+  "scripts": {
+    "print": "node ./print.js",
+    "check-access": "node ./scripts/check-accessibility.js"
+  },
   "dependencies": {
     "citeproc": "^2.4.63",
-    "html-pdf-chrome": "^0.8.4"
+    "puppeteer": "^24.0.0"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.0"
   }
 }
