@@ -1,12 +1,11 @@
 <div id="personinfo">
   <h1 id="person" class="personinfo">Professor Martin Paul Eve, Ph.D.</h1>
   <p id="cv" class="personinfo"><small><i>Curriculum Vitae</i></small></p>
-  <p id="jobtitle" class="personinfo">Professor of Literature, Technology and Publishing</p>
-  <p id="jobtitle2" class="personinfo">College Strategic Lead for Digital Education</p>
-  <p id="address1" class="personinfo">Birkbeck, University of London</p>
+  <p id="jobtitle" class="personinfo">Technical Lead, Knowledge Commons, Michigan State University</p>
+  <p id="jobtitle2" class="personinfo">Professor of Literature, Technology and Publishing, Birkbeck, University of London</p>
   <p class="personinfo">&nbsp;</p>
   <p id="address2" class="personinfo">School of Arts, 43 Gordon Square, London, WC1H 0PD</p>
   <p id="email" class="personinfo">email: <a href="mailto:martin.eve@bbk.ac.uk">martin.eve@bbk.ac.uk</a></p>
-  <p id="telephone" class="personinfo">telephone: +44 (0)203 073 8420</p>
+  <p id="email2" class="personinfo">email: <a href="mailto:evemartin@msu.edu">evemartin@msu.edu</a></p>
   <p id="orcid" class="personinfo">ORCID: <a href="https://orcid.org/0000-0002-5589-8511">0000-0002-5589-8511</a></p>
 </div>

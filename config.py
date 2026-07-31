@@ -96,7 +96,7 @@ output_rules = {'html': ['templates/HTML',
 
                 'pdf': ['templates/PDF',
                         'output/Eve-CV-PDF.html',
-                        'screen -S serve -d -m bash -c "python3 -m http.server"',
+                        'screen -S serve -d -m bash -c "python3 -m http.server 8001"',
                         'sleep 2',
                         'nodejs ./print.js',
                         'screen -S serve -X quit',
@@ -126,11 +126,11 @@ non_oa_status = {'html': ''}
 
 # list of venues to exclude from a list
 exclude_venues = {'pdf': {
-    'other_articles': 'martineve.com',
+    'other_articles': 'eve.gd',
     },
 
     'html': {
-        'other_articles': 'martineve.com',
+        'other_articles': 'eve.gd',
     }}
 
 # whether to italicize titles within specific rules
@@ -168,7 +168,7 @@ titles_to_italicize = ['Cloud Atlas', 'Abortion Eve', 'I’m Jack', 'Station Ele
                        'Nice Fish', 'The Man Who Knew Infinity', 'No’s Knife', 'The Alchemist', 'JR',
                        'The Glass Bead Game', 'Pynchon Notes', 'Cow Country', 'Twenty-First-Century Drama',
                        'A Visit from the Goon Squad', 'Mason & Dixon', 'Against the Day', 'Underworld', '1Q84',
-                       'Emerald City'
+                       'Emerald City', 'Telephone', 'Binding Media'
                        ]
 
 # specify the names of the special fields

@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "citeproc": "^2.4.63",
+    "html-pdf-chrome": "^0.8.4"
+  }
+}

@@ -1,9 +1,8 @@
 <div class="section" id="dh">
-<h2 class="sectionheader">DIGITAL HUMANITIES / SOFTWARE OUTPUTS (13)</h2>
+<h2 class="sectionheader">DIGITAL HUMANITIES / SOFTWARE OUTPUTS</h2>
 
 <p class="anitemnewdate genericitem"><span class="prefix bold">2022-</span><span class="bibitem"><span itemscope itemtype="http://schema.org/SoftwareApplication" id="https://github.com/MartinPaulEve/django-caretaker"><a href="https://github.com/MartinPaulEve/django-caretaker"><span itemprop="name">django-caretaker</span></a><span itemprop="author" itemscope itemtype="http://schema.org/Person" itemid="https://www.martineve.com"></span>: a <span itemprop="applicationCategory">platform</span> for backing up/digitallypreserving Django applications. Runs on <span itemprop="operatingSystem">Linux</span>.</span></span></p>
 <p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><a href="https://github.com/MartinPaulEve/time-and-tide">Time and Tide</a>: an AWS Lambda function to produce a tide times ical file for sea swimmers.</span></p>
-<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span>Jargon Detector: work in progress on an NLP tool to detect academic jargon.</span></p>
 
 <p class="anitemnewdate genericitem"><span class="prefix bold">2021-</span><span class="bibitem"><span itemprop="name">Open Book Collective</span></a><span itemprop="author" itemscope itemtype="http://schema.org/Person" itemid="https://www.martineve.com"></span>: a <span itemprop="applicationCategory">platform</span> for open-access monographs. Runs on <span itemprop="operatingSystem">Linux</span>.</span></span></p>
 

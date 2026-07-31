@@ -32,14 +32,20 @@
   {{edited_books}}
   {{peer_reviewed_articles}}
   {{book_chapters}}
-  
+
+  {{Funding}}
+
+  {{Crossref}}
+
+  {{OLH}}
+
+  {{InfoTech}}
+
   {{DigitalHumanities}}
 
   {{reviews}}
 
   {{Admin}}
-
-  {{Funding}}
 
   {{other_articles}}
 
@@ -58,8 +64,6 @@
   {{PeerReview}}
 
   {{Perform}}
-
-  {{InfoTech}}
 
   {{external:/home/martin/Documents/Programming/blogControl/musiccv.sh:/home/martin/Documents/Programming/blogControl/:/tmp/music.txt}}
 
