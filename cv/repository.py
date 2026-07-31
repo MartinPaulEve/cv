@@ -13,6 +13,8 @@ import os
 import requests
 
 from cv.configuration import encode_eprints_user
+from cv.dedupe import merge_records
+from cv.invenio import InvenioSource
 
 
 class Repository:
@@ -81,16 +83,26 @@ class Repository:
             self.logger.debug(f"Attempting to refresh {self.url}")
 
             try:
-                data = requests.get(self.url).text
+                records = json.loads(requests.get(self.url).text)
             except requests.RequestException as exc:
                 self.logger.error(f"Error fetching eprints data: {exc}")
                 self._json_loaded = False
                 return False
 
+            # merge in any configured InvenioRDM repository (e.g. KC Works),
+            # deduplicating by DOI with the eprints record preferred
+            if getattr(self.config, "invenio", None):
+                invenio_items = InvenioSource(self.config, self.logger).fetch()
+                self.logger.info(
+                    f"Merging {len(invenio_items)} InvenioRDM items "
+                    f"with {len(records)} eprints items"
+                )
+                records = merge_records(records, invenio_items)
+
             try:
                 with open(self.config.storage["json"], "w") as json_out_file:
-                    json_out_file.write(data)
-                    self.json = json.loads(data)
+                    json_out_file.write(json.dumps(records))
+                    self.json = records
                     self._json_loaded = True
                     return True
             except OSError:

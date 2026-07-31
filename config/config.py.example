@@ -33,6 +33,13 @@ orcid = "0000-0000-0000-0000"
 # the base URL of your eprints repository
 eprints = {'repo': 'eprints.example.ac.uk'}
 
+# optionally, an InvenioRDM repository (KC Works, Zenodo, ...) whose
+# records are merged with the eprints data on fetch; items sharing a DOI
+# with an eprints deposit are deduplicated, with the eprints record
+# preferred and its gaps filled from the InvenioRDM copy. Delete this
+# variable to fetch from eprints alone.
+invenio = {'api': 'https://works.hcommons.org/api/records'}
+
 # ---------------------------------------------------------------------------
 # Section definitions
 # ---------------------------------------------------------------------------

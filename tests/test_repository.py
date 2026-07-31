@@ -149,6 +149,55 @@ class TestJsonCaching:
             assert repo._populate_json(refresh=True) is False
 
 
+class TestMultiSourceFetch:
+    def test_refresh_merges_invenio_records_into_the_cache(
+        self, fake_config, logger
+    ):
+        """With an invenio source configured, a refresh merges its records
+        with the eprints data (deduplicated by DOI, eprints preferred)
+        into the single cache file that the rest of the pipeline reads."""
+        fake_config.invenio = {"api": "https://works.example.org/api/records"}
+
+        eprints_payload = [
+            {"type": "book", "title": "Shared Book", "doi": "10.1/shared"},
+            {"type": "book", "title": "Eprints Only"},
+        ]
+        invenio_items = [
+            {
+                "type": "book",
+                "title": "Shared Book (KC)",
+                "doi": "10.1/SHARED",
+                "publisher": "punctum books",
+            },
+            {"type": "article", "title": "KC Only", "refereed": "TRUE"},
+        ]
+
+        class FakeInvenioSource:
+            def __init__(self, config, logger):
+                pass
+
+            def fetch(self):
+                return invenio_items
+
+        repo = Repository(fake_config, logger, refresh=True)
+
+        with (
+            patch("cv.repository.requests.get") as mock_get,
+            patch("cv.repository.InvenioSource", FakeInvenioSource),
+        ):
+            mock_get.return_value.text = json.dumps(eprints_payload)
+            assert repo._populate_json(refresh=True) is True
+
+        titles = [item["title"] for item in repo.json]
+        assert titles == ["Shared Book", "Eprints Only", "KC Only"]
+        # the shared record took the publisher from the KC copy
+        assert repo.json[0]["publisher"] == "punctum books"
+
+        # and the merged list is what got cached on disk
+        with open(fake_config.storage["json"]) as cached:
+            assert json.load(cached) == repo.json
+
+
 class TestFetchPipeline:
     def test_fetch_writes_classified_sections_to_disk(self, repo, fake_config):
         """The core contract: fetch() splits repository JSON into per-type files."""

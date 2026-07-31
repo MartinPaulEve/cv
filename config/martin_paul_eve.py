@@ -10,6 +10,12 @@ orcid = "0000-0002-5589-8511"
 # automatically from the plaintext user variable above
 eprints = {'repo': 'eprints.bbk.ac.uk'}
 
+# an InvenioRDM repository (KC Works) whose records are merged with the
+# eprints data on fetch; items sharing a DOI with an eprints deposit are
+# deduplicated, with the eprints record preferred and its gaps filled
+# from the InvenioRDM copy
+invenio = {'api': 'https://works.hcommons.org/api/records'}
+
 # this controls the output headings in the template
 section_headings = {'pdf': {'all_books': "BOOKS",
                     'unedited_books': "BOOKS",
