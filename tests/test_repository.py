@@ -7,9 +7,11 @@ is mocked.
 """
 
 import json
+import os
 from unittest.mock import patch
 
 import pytest
+import requests
 
 from cv.repository import Repository
 
@@ -148,6 +150,33 @@ class TestJsonCaching:
             mock_get.side_effect = requests_lib.RequestException("boom")
             assert repo._populate_json(refresh=True) is False
 
+    def test_http_error_preserves_the_last_good_cache(self, repo, fake_config):
+        previous = [{"type": "book", "title": "Cached book"}]
+        with open(fake_config.storage["json"], "w") as cached:
+            json.dump(previous, cached)
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = "[]"
+            mock_get.return_value.raise_for_status.side_effect = (
+                requests.HTTPError("server error")
+            )
+            assert repo._populate_json(refresh=True) is False
+
+        with open(fake_config.storage["json"]) as cached:
+            assert json.load(cached) == previous
+
+    def test_malformed_json_preserves_the_last_good_cache(self, repo, fake_config):
+        previous = [{"type": "book", "title": "Cached book"}]
+        with open(fake_config.storage["json"], "w") as cached:
+            json.dump(previous, cached)
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = "<html>upstream error</html>"
+            assert repo._populate_json(refresh=True) is False
+
+        with open(fake_config.storage["json"]) as cached:
+            assert json.load(cached) == previous
+
 
 class TestMultiSourceFetch:
     def test_refresh_merges_invenio_records_into_the_cache(
@@ -220,3 +249,22 @@ class TestFetchPipeline:
             out.write(json.dumps({"title": "A Monograph"}) + "\n")
 
         assert repo.books == [{"title": "A Monograph"}]
+
+    def test_fetch_only_writes_requested_sections(self, repo, fake_config):
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = json.dumps(SAMPLE_ITEMS)
+            assert repo.fetch(["books"]) is True
+
+        assert os.path.isfile(fake_config.storage["books"])
+        assert not os.path.exists(fake_config.storage["articles"])
+
+    def test_empty_refresh_clears_a_requested_section(self, repo, fake_config):
+        with open(fake_config.storage["books"], "w") as stored:
+            stored.write(json.dumps({"title": "Stale book"}) + "\n")
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = "[]"
+            assert repo.fetch(["books"]) is True
+
+        with open(fake_config.storage["books"]) as stored:
+            assert stored.read() == ""

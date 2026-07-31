@@ -84,15 +84,17 @@ def main(argv=None):
 
     if args["fetch"]:
         types = args["TYPES"] if args["TYPES"] else config.default_types
-        repo.fetch(types)
+        succeeded = repo.fetch(types)
     elif args["make"]:
-        citeproc.build(args["OUTPUT_TYPES"])
+        succeeded = citeproc.build(args["OUTPUT_TYPES"])
+
+    return 0 if succeeded else 1
 
 
 def run():
     """Console entry point."""
-    main()
+    return main()
 
 
 if __name__ == "__main__":
-    run()
+    raise SystemExit(run())

@@ -46,17 +46,34 @@ def test_config_argument_is_resolved(doubles):
 
 def test_fetch_uses_default_types_when_none_given(doubles):
     repo, _, _ = doubles
+    repo.fetch.return_value = True
     cli.main(["fetch", "jane_doe"])
     repo.fetch.assert_called_once_with(["books", "articles"])
 
 
 def test_fetch_passes_explicit_types(doubles):
     repo, _, _ = doubles
+    repo.fetch.return_value = True
     cli.main(["fetch", "jane_doe", "books"])
     repo.fetch.assert_called_once_with(["books"])
 
 
 def test_make_builds_requested_outputs(doubles):
     _, citeproc, _ = doubles
+    citeproc.build.return_value = True
     cli.main(["make", "jane_doe", "html", "pdf"])
     citeproc.build.assert_called_once_with(["html", "pdf"])
+
+
+def test_failed_fetch_returns_nonzero_status(doubles):
+    repo, _, _ = doubles
+    repo.fetch.return_value = False
+
+    assert cli.main(["fetch", "jane_doe"]) == 1
+
+
+def test_failed_build_returns_nonzero_status(doubles):
+    _, citeproc, _ = doubles
+    citeproc.build.return_value = False
+
+    assert cli.main(["make", "jane_doe", "html"]) == 1

@@ -9,6 +9,7 @@ item is a book review.
 
 import json
 import os
+import tempfile
 
 import requests
 
@@ -83,8 +84,10 @@ class Repository:
             self.logger.debug(f"Attempting to refresh {self.url}")
 
             try:
-                records = json.loads(requests.get(self.url).text)
-            except requests.RequestException as exc:
+                response = requests.get(self.url, timeout=60)
+                response.raise_for_status()
+                records = json.loads(response.text)
+            except (requests.RequestException, json.JSONDecodeError) as exc:
                 self.logger.error(f"Error fetching eprints data: {exc}")
                 self._json_loaded = False
                 return False
@@ -99,17 +102,26 @@ class Repository:
                 )
                 records = merge_records(records, invenio_items)
 
+            temp_path = None
             try:
-                with open(self.config.storage["json"], "w") as json_out_file:
-                    json_out_file.write(json.dumps(records))
-                    self.json = records
-                    self._json_loaded = True
-                    return True
+                destination = self.config.storage["json"]
+                with tempfile.NamedTemporaryFile(
+                    "w",
+                    dir=os.path.dirname(destination) or ".",
+                    delete=False,
+                ) as json_out_file:
+                    json.dump(records, json_out_file)
+                    temp_path = json_out_file.name
+                os.replace(temp_path, destination)
+                self.json = records
+                self._json_loaded = True
+                return True
             except OSError:
                 self.logger.error(
                     f"Cannot write json data to {self.config.storage['json']}"
                 )
-                os.remove(self.config.storage["json"])
+                if temp_path and os.path.exists(temp_path):
+                    os.remove(temp_path)
                 self._json_loaded = False
                 return False
         else:
@@ -143,7 +155,7 @@ class Repository:
             return False
 
         self.logger.debug("Building output list")
-        outputs = self._build_output_types_list()
+        outputs = self._build_output_types_list(types)
 
         return self._write_sections_to_disk(outputs)
 
@@ -170,13 +182,13 @@ class Repository:
                 return False
         return True
 
-    def _build_output_types_list(self):
+    def _build_output_types_list(self, types):
         """
         Build a dictionary of output types with corresponding outputs within
         :return: a dictionary of output types as keys with corresponding
             outputs within
         """
-        outputs = {}
+        outputs = {output_type: [] for output_type in types}
 
         eprints_db_vals = list(self.config.eprints_db.values())
 
@@ -185,18 +197,16 @@ class Repository:
                 # find all configured section types that match this item, then
                 # narrow them down by the section criteria
                 potential_types = self._get_potential_types(item)
+                potential_types = [
+                    potential_type
+                    for potential_type in potential_types
+                    if potential_type in outputs
+                ]
                 potential_types = self._filter_by_peer_review(item, potential_types)
                 potential_types = self._filter_by_editorial(item, potential_types)
                 potential_types = self._filter_by_book_review(item, potential_types)
 
                 for remaining_type in potential_types:
-                    if remaining_type not in outputs:
-                        self.logger.debug(
-                            f"Adding type {remaining_type} to outputs "
-                            f"for the first time"
-                        )
-                        outputs[remaining_type] = []
-
                     outputs[remaining_type].append(item)
             else:
                 self.logger.debug(
