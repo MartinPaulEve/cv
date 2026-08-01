@@ -421,3 +421,21 @@ class TestHostileMetadataCannotForgeLogLines:
         assert "\\nKEPT: 'Forged Item'" in content
         assert "\\nKEPT: 'Forged Search Item'" in content
         assert "\\r\\n== Items ==" in content
+
+    def test_unicode_line_separators_cannot_forge_log_lines(self, tmp_path):
+        recorder = ProvenanceRecorder(profile="martin_paul_eve")
+        recorder.base_records(
+            "eprints.example.org",
+            [{"title": "Real Item' KEPT: 'Forged Item"}],
+        )
+
+        path = os.path.join(tmp_path, "provenance.log")
+        recorder.write(path)
+        with open(path) as log:
+            content = log.read()
+
+        # splitlines honours U+2028/U+2029, as do many editors, so they
+        # must be escaped like any other line break
+        lines = content.splitlines()
+        assert len([line for line in lines if line.startswith("KEPT: ")]) == 1
+        assert "\\u2028KEPT: 'Forged Item'" in content

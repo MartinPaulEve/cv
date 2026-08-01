@@ -23,9 +23,10 @@ def _clean(value):
     """
     Make a value safe to interpolate into one log line. Metadata arrives
     from remote repositories, so a crafted title or query containing
-    newlines could otherwise forge entries in the audit trail; control
-    and format characters are rendered as visible escapes instead of
-    being obeyed, so nothing is silently lost either.
+    newlines could otherwise forge entries in the audit trail; control,
+    format, and Unicode line/paragraph separator characters are rendered
+    as visible escapes instead of being obeyed, so nothing is silently
+    lost either.
     :param value: the value to sanitise
     :return: a single-line string with control characters escaped
     """
@@ -33,7 +34,7 @@ def _clean(value):
     for char in str(value):
         if char in _ESCAPES:
             cleaned.append(_ESCAPES[char])
-        elif unicodedata.category(char) in ("Cc", "Cf"):
+        elif unicodedata.category(char) in ("Cc", "Cf", "Zl", "Zp"):
             cleaned.append(f"\\u{ord(char):04x}")
         else:
             cleaned.append(char)
