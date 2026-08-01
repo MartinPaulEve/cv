@@ -17,6 +17,7 @@ dependencies = [
 [project.scripts]
 cv = "cv.cli:run"
 cv-print = "cv.printpdf:run"
+cv-check-access = "cv.access_check:run"
 
 [dependency-groups]
 dev = [
