@@ -6,17 +6,24 @@ example — should work. Records are normalised into the same internal
 item shape that the eprints pipeline consumes, so everything downstream
 of fetching is source-agnostic.
 
-Two searches are run and unioned: one by the creator's name and, where an
-ORCID is configured, one by that identifier. Neither alone is complete —
-records imported from legacy systems often lack ORCIDs, while a name
-match can miss variant forms — so the union is the safest net.
+By default two searches are run and unioned: one by the creator's name
+and, where an ORCID is configured, one by that identifier. Neither alone
+is complete — records imported from legacy systems often lack ORCIDs,
+while a name match can miss variant forms — so the union is the safest
+net. A repository entry may override this with a `search` specification
+naming strategies ('name', 'orcid', or a 'query:<raw query>' escape
+hatch) and a combine mode ('union' or 'first').
 """
 
 from urllib.parse import quote, urljoin
 
 import requests
 
-from cv.sources import default_source_name
+from cv.sources import (
+    SourceConfigurationError,
+    default_source_name,
+    parse_search_spec,
+)
 
 # how InvenioRDM resource types map onto the internal eprints-style types;
 # types absent from this mapping (blog posts, video, and so on) have no CV
@@ -82,19 +89,69 @@ class InvenioSource:
             f'"{self.config.orcid}"'
         )
 
+    def _search_plan(self):
+        """The (strategies, mode) plan for this repository: its entry's
+        `search` key, or the historic default of the creator-name query
+        unioned with the ORCID query where an ORCID is configured."""
+        spec = parse_search_spec(self.config.invenio.get("search"))
+
+        if spec is not None:
+            return spec
+
+        strategies = ["name"]
+        if getattr(self.config, "orcid", None):
+            strategies.append("orcid")
+
+        return strategies, "union"
+
+    def _query_for(self, strategy):
+        """
+        The records query one search strategy issues
+        :param strategy: 'name', 'orcid', or 'query:<raw invenio query>'
+        :return: an InvenioRDM query string
+        """
+        if strategy == "name":
+            return self.creator_query()
+
+        if strategy == "orcid":
+            query = self.orcid_query()
+            if query is None:
+                raise SourceConfigurationError(
+                    f"{self.name}: the 'orcid' search strategy needs an "
+                    "`orcid` in the configuration"
+                )
+            return query
+
+        if strategy.startswith("query:"):
+            return strategy[len("query:") :]
+
+        raise SourceConfigurationError(
+            f"{self.name}: unknown InvenioRDM search strategy '{strategy}' "
+            "(expected 'name', 'orcid', or 'query:<raw query>')"
+        )
+
     def fetch(self):
         """
-        Fetch all of the user's records and normalise them
+        Fetch all of the user's records by running the search plan, and
+        normalise them
         :return: a list of internal-format items (unmapped types omitted)
         """
-        queries = [self.creator_query()]
-        if self.orcid_query():
-            queries.append(self.orcid_query())
+        strategies, mode = self._search_plan()
 
         records = {}
-        for query in queries:
-            for record in self._search(query):
+        for strategy in strategies:
+            found = list(self._search(self._query_for(strategy)))
+
+            self.logger.debug(
+                f"{self.name}: strategy '{strategy}' returned "
+                f"{len(found)} records"
+            )
+
+            for record in found:
                 records[record["id"]] = record
+
+            if mode == "first" and found:
+                break
 
         self.logger.debug(f"Fetched {len(records)} InvenioRDM records")
 
