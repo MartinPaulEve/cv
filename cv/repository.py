@@ -9,8 +9,13 @@ item is a book review.
 
 import json
 import os
+import tempfile
 
 import requests
+
+from cv.configuration import encode_eprints_user
+from cv.dedupe import merge_records
+from cv.invenio import InvenioSource
 
 
 class Repository:
@@ -56,7 +61,12 @@ class Repository:
         if not repo.endswith("/"):
             repo += "/"
 
-        user = self.config.eprints["user"]
+        # a pre-encoded eprints user in the config wins; otherwise the
+        # identifier is derived from the plaintext user name
+        if "user" in self.config.eprints:
+            user = self.config.eprints["user"]
+        else:
+            user = encode_eprints_user(self.config.user)
         url = f"{repo}cgi/exportview/people/{user}/JSON/{user}.js"
 
         self.logger.debug(f"Built repository URL as: {url}")
@@ -75,23 +85,52 @@ class Repository:
             self.logger.debug(f"Attempting to refresh {self.url}")
 
             try:
-                data = requests.get(self.url).text
-            except requests.RequestException as exc:
+                response = requests.get(self.url, timeout=60)
+                response.raise_for_status()
+                records = json.loads(response.text)
+            except (requests.RequestException, json.JSONDecodeError) as exc:
                 self.logger.error(f"Error fetching eprints data: {exc}")
                 self._json_loaded = False
                 return False
 
+            # merge in any configured InvenioRDM repository (e.g. KC Works),
+            # deduplicating by DOI with the eprints record preferred
+            if getattr(self.config, "invenio", None):
+                try:
+                    invenio_items = InvenioSource(
+                        self.config, self.logger
+                    ).fetch()
+                except requests.RequestException as exc:
+                    self.logger.error(f"Error fetching InvenioRDM data: {exc}")
+                    self._json_loaded = False
+                    return False
+                self.logger.info(
+                    f"Merging {len(invenio_items)} InvenioRDM items "
+                    f"with {len(records)} eprints items"
+                )
+                records = merge_records(records, invenio_items)
+
+            temp_path = None
             try:
-                with open(self.config.storage["json"], "w") as json_out_file:
-                    json_out_file.write(data)
-                    self.json = json.loads(data)
-                    self._json_loaded = True
-                    return True
+                destination = self.config.storage["json"]
+                os.makedirs(os.path.dirname(destination) or ".", exist_ok=True)
+                with tempfile.NamedTemporaryFile(
+                    "w",
+                    dir=os.path.dirname(destination) or ".",
+                    delete=False,
+                ) as json_out_file:
+                    json.dump(records, json_out_file)
+                    temp_path = json_out_file.name
+                os.replace(temp_path, destination)
+                self.json = records
+                self._json_loaded = True
+                return True
             except OSError:
                 self.logger.error(
                     f"Cannot write json data to {self.config.storage['json']}"
                 )
-                os.remove(self.config.storage["json"])
+                if temp_path and os.path.exists(temp_path):
+                    os.remove(temp_path)
                 self._json_loaded = False
                 return False
         else:
@@ -125,7 +164,7 @@ class Repository:
             return False
 
         self.logger.debug("Building output list")
-        outputs = self._build_output_types_list()
+        outputs = self._build_output_types_list(types)
 
         return self._write_sections_to_disk(outputs)
 
@@ -140,7 +179,9 @@ class Repository:
                 f"Writing {output_type} to {self.config.storage[output_type]}"
             )
             try:
-                with open(self.config.storage[output_type], "w") as json_out_file:
+                destination = self.config.storage[output_type]
+                os.makedirs(os.path.dirname(destination) or ".", exist_ok=True)
+                with open(destination, "w") as json_out_file:
                     for output in output_list:
                         json_out_file.write(json.dumps(output) + "\n")
             except OSError:
@@ -152,13 +193,13 @@ class Repository:
                 return False
         return True
 
-    def _build_output_types_list(self):
+    def _build_output_types_list(self, types):
         """
         Build a dictionary of output types with corresponding outputs within
         :return: a dictionary of output types as keys with corresponding
             outputs within
         """
-        outputs = {}
+        outputs = {output_type: [] for output_type in types}
 
         eprints_db_vals = list(self.config.eprints_db.values())
 
@@ -167,18 +208,16 @@ class Repository:
                 # find all configured section types that match this item, then
                 # narrow them down by the section criteria
                 potential_types = self._get_potential_types(item)
+                potential_types = [
+                    potential_type
+                    for potential_type in potential_types
+                    if potential_type in outputs
+                ]
                 potential_types = self._filter_by_peer_review(item, potential_types)
                 potential_types = self._filter_by_editorial(item, potential_types)
                 potential_types = self._filter_by_book_review(item, potential_types)
 
                 for remaining_type in potential_types:
-                    if remaining_type not in outputs:
-                        self.logger.debug(
-                            f"Adding type {remaining_type} to outputs "
-                            f"for the first time"
-                        )
-                        outputs[remaining_type] = []
-
                     outputs[remaining_type].append(item)
             else:
                 self.logger.debug(

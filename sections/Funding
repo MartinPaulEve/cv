@@ -1,30 +1,32 @@
 <div class="section" id="funding">
 	<h2 class="sectionheader">GRANTS/EXTERNAL INCOME GENERATION</h2>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2023</span><span class="bibitem">Open Book Futures (£5,800,000) – Arcadia Fund and Research England (Co-I)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">OLH (£200,000) – Arcadia Fund (PI)</span></p>	
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Janeway ($100,000) – Educopia (PI)</span></p>	
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">COPIM (£2,202,947) – Research England (Co-I)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">COPIM (£800,000) – Arcadia Fund (Co-I)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Open Metrics Monograph Experiment (£30,000) – Jisc (PI)</span></p>
+	<ul class="publist">
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2023</span><span class="bibitem">Open Book Futures (£5,800,000) – Arcadia Fund and Research England (Co-I)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">OLH (£200,000) – Arcadia Fund (PI)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2021: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Janeway ($100,000) – Educopia (PI)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">COPIM (£2,202,947) – Research England (Co-I)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2019: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">COPIM (£800,000) – Arcadia Fund (Co-I)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2019: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Open Metrics Monograph Experiment (£30,000) – Jisc (PI)</span></li>
 
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2018</span><span class="bibitem">Second Call for Funding for Non-Author-Fee-Based Publishing Initiatives (€30,500) – OpenAIRE (PI)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Reading Peer Review ($99,000) – Andrew W. Mellon Foundation (PI)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2015</span><span class="bibitem">Open Library of Humanities Expansion Grant ($741,000) – Andrew W. Mellon Foundation, 2015 (PI)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Editorial Assistance Funding (£4,000) – Open Knowledge</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Book Processing Charge Funding (£6,500) – Open Knowledge</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Funding for Postdoc and Ph.D. on transcription and annotation project (£50,000) – private donor</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">External matched Ph.D. funding (£30,000) – Jisc Collections</span></p>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2018</span><span class="bibitem">Second Call for Funding for Non-Author-Fee-Based Publishing Initiatives (€30,500) – OpenAIRE (PI)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Reading Peer Review ($99,000) – Andrew W. Mellon Foundation (PI)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2015</span><span class="bibitem">Open Library of Humanities Expansion Grant ($741,000) – Andrew W. Mellon Foundation, 2015 (PI)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2015: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Editorial Assistance Funding (£4,000) – Open Knowledge</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2015: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Book Processing Charge Funding (£6,500) – Open Knowledge</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2015: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Funding for Postdoc and Ph.D. on transcription and annotation project (£50,000) – private donor</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2015: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">External matched Ph.D. funding (£30,000) – Jisc Collections</span></li>
 	
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2014</span><span class="bibitem">Open Library of Humanities Planning Grant ($90,000) – Andrew W. Mellon Foundation (PI)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">meTypeset: JATS-XML Unsupervised Typesetter (£13,263) – Public Knowledge Project, Stanford/Simon Fraser (PI)</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2013</span><span class="bibitem">Norwegian School of Economics (£272) – awarded by event organisers for invited keynote, Bergen, Norway</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">SPARC Japan Speaking (£1,600)  – awarded by conference organisers for invited keynote, Tokyo 2013</span></p>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2014</span><span class="bibitem">Open Library of Humanities Planning Grant ($90,000) – Andrew W. Mellon Foundation (PI)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2014: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">meTypeset: JATS-XML Unsupervised Typesetter (£13,263) – Public Knowledge Project, Stanford/Simon Fraser (PI)</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2013</span><span class="bibitem">Norwegian School of Economics (£272) – awarded by event organisers for invited keynote, Bergen, Norway</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2013: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">SPARC Japan Speaking (£1,600)  – awarded by conference organisers for invited keynote, Tokyo 2013</span></li>
 
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2012</span><span class="bibitem">Journal Funding (£750) – Ludwig-Maximilians-Universität, Munich for postgraduate training funds to support Orbit</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">UKSG Conference Speaking (£455) – awarded by the conference organizers</span></p>	
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Conference Funding (£250) – contributed by academic publishers Gylphi and Taylor &amp; Francis to cover refreshments at First Fictions</span></p>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2012</span><span class="bibitem">Journal Funding (£750) – Ludwig-Maximilians-Universität, Munich for postgraduate training funds to support Orbit</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2012: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">UKSG Conference Speaking (£455) – awarded by the conference organizers</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2012: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Conference Funding (£250) – contributed by academic publishers Gylphi and Taylor &amp; Francis to cover refreshments at First Fictions</span></li>
 
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2011</span><span class="bibitem">Student-Led Initiative (£2,000) – AHRC (Co-I)</span></p>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2011</span><span class="bibitem">Student-Led Initiative (£2,000) – AHRC (Co-I)</span></li>
 
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2009</span><span class="bibitem">Full Doctoral Funding Award (£40,770) – AHRC</span></p>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2009</span><span class="bibitem">Full Doctoral Funding Award (£40,770) – AHRC</span></li>
+	</ul>
 </div>

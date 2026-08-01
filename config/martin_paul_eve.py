@@ -1,7 +1,20 @@
-# this specifies the base eprints URL and the user page
-eprints = {
-    'repo': 'eprints.bbk.ac.uk',
-    'user': 'Eve=3AMartin_Paul=3A=3A'}
+user = "Martin Paul Eve"
+
+# email addresses that repositories may hold for this user
+emails = ["martin.eve@bbk.ac.uk", "eve@msu.edu", "martin@eve.gd"]
+
+# ORCID identifier, for repository sources that can search by identifier
+orcid = "0000-0002-5589-8511"
+
+# this specifies the base eprints URL; the person identifier is derived
+# automatically from the plaintext user variable above
+eprints = {'repo': 'eprints.bbk.ac.uk'}
+
+# an InvenioRDM repository (KC Works) whose records are merged with the
+# eprints data on fetch; items sharing a DOI with an eprints deposit are
+# deduplicated, with the eprints record preferred and its gaps filled
+# from the InvenioRDM copy
+invenio = {'api': 'https://works.hcommons.org/api/records'}
 
 # this controls the output headings in the template
 section_headings = {'pdf': {'all_books': "BOOKS",
@@ -96,33 +109,51 @@ output_rules = {'html': ['templates/HTML',
 
                 'pdf': ['templates/PDF',
                         'output/Eve-CV-PDF.html',
-                        'screen -S serve -d -m bash -c "python3 -m http.server 8001"',
-                        'sleep 2',
-                        'nodejs ./print.js',
-                        'screen -S serve -X quit',
+                        'node ./print.js output/Eve-CV-PDF.html output/Eve-CV.pdf',
                         ]}
 
 # define the section template
-section_template = {'pdf': '<div id="{0}">{1}</div>',
-                    'html': '<div id="{0}">{1}</div>'}
+# sections are semantic <section> landmarks so that assistive technology can
+# navigate between them
+section_template = {
+    'pdf': '<section id="{0}" aria-labelledby="{2}">{1}</section>',
+    'html': '<section id="{0}" aria-labelledby="{2}">{1}</section>'}
 
 # define the header template
-header_template = {'pdf': '<h2 class="sectionheader">{0} ({1})</h2>',
-                   'html': '<h3 class="sectionheader">{0} ({1})</h3>'}
+header_template = {'pdf': '<h2 id="{2}" class="sectionheader">{0} ({1})</h2>',
+                   'html': '<h3 id="{2}" class="sectionheader">{0} ({1})</h3>'}
+
+# define the list wrapper placed around the items of each publication section
+# (real lists are announced item-by-item by screen readers; the inline style
+# keeps the HTML fragment self-contained when transcluded into other sites)
+# line-height 1.6 keeps every link's touch target at or above 24 CSS pixels
+# (WCAG 2.5.8) even when the fragment is embedded in a page with tight styles
+list_template = {'pdf': '<ul class="publist">{0}</ul>',
+                 'html': '<ul class="publist" style="list-style:none;margin:0;'
+                         'padding:0;line-height:1.6">{0}</ul>'}
 
 # whether to replace repository links to gold OA titles with the official URL
 gold_oa_direct_link = {'pdf': True,
                        'html': True}
 
 # the email address for OA status display
-email = "martin.eve@bbk.ac.uk"
+email = emails[0]
 
 # basic OA availability
 # note: [[doc]] will insert a space if required
-oa_status = {'html': ' [<a href="[[oa_uri]]" style="color:[[oa_color]]">Download[[doc]]</a>]'}
+# the aria-label names the link target (WCAG 2.4.9) and states the OA route
+# in text so that gold versus green is not conveyed by colour alone (1.4.1)
+oa_status = {'html': ' [<a href="[[oa_uri]]" style="color:[[oa_color]]" '
+                     'aria-label="Download the [[oa_route]] open access '
+                     'version of [[title]]">Download[[doc]]</a>]'}
 
 # basic OA nonavailability
 non_oa_status = {'html': ''}
+
+# the colours used for open access download links; both values meet the
+# WCAG 2.2 AAA enhanced contrast ratio of 7:1 against a white background
+oa_colors = {'gold': '#6B5300',
+             'green': '#175117'}
 
 # list of venues to exclude from a list
 exclude_venues = {'pdf': {
@@ -182,56 +213,43 @@ editor_field_top_level = 'name'
 editor_field_given_name = 'given'
 editor_field_last_name = 'family'
 
-# citeproc support
-citeproc_js_server_directory = '/home/martin/Documents/Programming/citeproc-js-server'
+# the directory holding vendored CSL styles and locales
+csl_directory = 'static/csl'
+
+# the CSL locale used for citation rendering
+citeproc_locale = 'en-GB'
 
 # define the item templates in citeproc mode
-citeproc_item_templates = {'pdf': {
-    'all_books': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'unedited_books': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'edited_books': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'all_peer_reviewed_articles': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'peer_reviewed_articles': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'other_articles': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'reviews': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'book_chapters': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>',
-    'conference_items': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]]</span></p>'},
+# each item is a list entry; the prefix column is aria-hidden because it is a
+# purely visual navigation aid (the year is already part of every citation)
+_types = ['all_books', 'unedited_books', 'edited_books',
+          'all_peer_reviewed_articles', 'peer_reviewed_articles',
+          'other_articles', 'reviews', 'book_chapters', 'conference_items']
 
-    'html': {
-        'all_books': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'unedited_books': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'edited_books': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'all_peer_reviewed_articles': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'peer_reviewed_articles': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'other_articles': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'reviews': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'book_chapters': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'conference_items': '<p class="anitem genericitem"><span class="prefix">&nbsp;</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>'}
-}
+_pdf_item = ('<li class="anitem genericitem"><span class="prefix" '
+             'aria-hidden="true">&nbsp;</span><span class="bibitem">'
+             '[[citeproc]]</span></li>')
+
+_html_item = ('<li class="anitem genericitem"><span class="prefix" '
+              'aria-hidden="true">&nbsp;</span><span class="bibitem">'
+              '[[citeproc]] [[oa_status]]</span></li>')
+
+citeproc_item_templates = {'pdf': {t: _pdf_item for t in _types},
+                           'html': {t: _html_item for t in _types}}
 
 # define the item templates for new date lines in citeproc mode
-citeproc_item_templates_new_date = {'pdf': {
-    'all_books': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'unedited_books': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'edited_books': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'all_peer_reviewed_articles': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'peer_reviewed_articles': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'other_articles': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'reviews': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'book_chapters': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>',
-    'conference_items': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]]</span></p>'},
+_pdf_item_new_date = ('<li class="anitemnewdate genericitem"><span '
+                      'class="prefix bold" aria-hidden="true">[[year]]</span>'
+                      '<span class="bibitem">[[citeproc]]</span></li>')
 
-    'html': {
-        'all_books': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'unedited_books': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'edited_books': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'all_peer_reviewed_articles': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'peer_reviewed_articles': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'other_articles': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'reviews': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'book_chapters': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>',
-        'conference_items': '<p class="anitemnewdate genericitem"><span class="prefix bold">[[year]]</span><span class="bibitem">[[citeproc]] [[oa_status]]</span></p>'}
-}
+_html_item_new_date = ('<li class="anitemnewdate genericitem"><span '
+                       'class="prefix bold" aria-hidden="true">[[year]]</span>'
+                       '<span class="bibitem">[[citeproc]] [[oa_status]]'
+                       '</span></li>')
+
+citeproc_item_templates_new_date = {
+    'pdf': {t: _pdf_item_new_date for t in _types},
+    'html': {t: _html_item_new_date for t in _types}}
 
 # this determines the underlying database type in eprints
 citeproc_type_mapper = {'all_books': "book",
@@ -247,12 +265,3 @@ citeproc_type_mapper = {'all_books': "book",
 # the citeproc style to use
 citeproc_style = {'pdf': 'modern-humanities-research-association',
                   'html': 'modern-humanities-research-association'}
-
-# the fire-up address of the citeproc server
-citeproc_server = 'http://127.0.0.1:{0}'
-
-# citeproc startup delay
-citeproc_delay = 7
-
-# citeproc ports
-citeproc_ports = ['8085', '8086', '8087', '8088', '8089', '8090', '8091', '8092', '8093', '8094', '8095', '8096']

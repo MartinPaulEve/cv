@@ -1,23 +1,25 @@
 <div class="section">
 	<h2 class="sectionheader">AWARDS AND HONOURS</h2>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2025</span><span class="bibitem">SHARP DeLong Prize for Book History</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2024</span><span class="bibitem">Association of University Presses StandUP Award</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2023</span><span class="bibitem">Open Library of Humanities Award</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2022</span><span class="bibitem">Canadian Social Knowledge Institute's Open Scholarship Award</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Birkbeck Effects Award for OLH and Disability Advocacy</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">Shaw Trust List of 100 Most Influential People with Disabilities in the UK</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Shortlisted for Association of Learned and Professional Society Publishers innovation award for COPIM/Opening the Future</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">Elected Fellow of the English Association</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Association of Online Publishers Small Digital Publisher of the Year for The Open Library of Humanities</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Highly Commended for The Open Library of Humanities at the Association of Learned and Professional Society Publishers</span></p>
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Philip Leverhulme Prize in Literatures and Languages</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Open Publishing Award for The Open Library of Humanities</span></p>
+	<ul class="publist">
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2025</span><span class="bibitem">SHARP DeLong Prize for Book History</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2024</span><span class="bibitem">Association of University Presses StandUP Award</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2023</span><span class="bibitem">Open Library of Humanities Award</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2022</span><span class="bibitem">Canadian Social Knowledge Institute's Open Scholarship Award</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2022: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Birkbeck Effects Award for OLH and Disability Advocacy</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2021</span><span class="bibitem">Shaw Trust List of 100 Most Influential People with Disabilities in the UK</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2021: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Shortlisted for Association of Learned and Professional Society Publishers innovation award for COPIM/Opening the Future</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2020</span><span class="bibitem">Elected Fellow of the English Association</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2020: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Association of Online Publishers Small Digital Publisher of the Year for The Open Library of Humanities</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2020: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Highly Commended for The Open Library of Humanities at the Association of Learned and Professional Society Publishers</span></li>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2019</span><span class="bibitem">Philip Leverhulme Prize in Literatures and Languages</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2019: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Open Publishing Award for The Open Library of Humanities</span></li>
 	
-	<p class="anitemnewdate genericitem"><span class="prefix bold">2018</span><span class="bibitem">KU Leuven Medal of Honour in the Humanities and Social Sciences</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">Electronic Literature Organization's N. Katherine Hayles Award for <i>The Bloomsbury Handbook of Electronic Literature</i> (shared with editors and contributors)</span></p>
-	<p class="anitem genericitem"><span class="prefix bold">&nbsp;</span><span class="bibitem">BACLS Edited Collection Award for <i>The Routledge Companion to Twenty-First Century Literary Fiction</i> (shared with editors and contributors)</span></p>
+		<li class="anitemnewdate genericitem"><span class="prefix bold">2018</span><span class="bibitem">KU Leuven Medal of Honour in the Humanities and Social Sciences</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2018: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">Electronic Literature Organization's N. Katherine Hayles Award for <i>The Bloomsbury Handbook of Electronic Literature</i> (shared with editors and contributors)</span></li>
+		<li class="anitem genericitem"><span class="sr-only">2018: </span><span class="prefix bold" aria-hidden="true">&nbsp;</span><span class="bibitem">BACLS Edited Collection Award for <i>The Routledge Companion to Twenty-First Century Literary Fiction</i> (shared with editors and contributors)</span></li>
  	
- 	<p class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Guardian Higher Education Most Inspiring Leader (finalist)</span></p>
+ 		<li class="anitemnewdate genericitem"><span class="prefix bold">2017</span><span class="bibitem">Guardian Higher Education Most Inspiring Leader (finalist)</span></li>
  	
- 	<p class="anitemnewdate genericitem"><span class="prefix bold">2008</span><span class="bibitem">Westfield Trust Prize for Outstanding Academic Achievement</span></p>
+ 		<li class="anitemnewdate genericitem"><span class="prefix bold">2008</span><span class="bibitem">Westfield Trust Prize for Outstanding Academic Achievement</span></li>
+	</ul>
 </div>

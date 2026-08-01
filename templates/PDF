@@ -1,19 +1,27 @@
 <!DOCTYPE html>
-<html>
+<html lang="en-GB">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Martin Paul Eve</title>
+  <title>{{config:user}}: Curriculum Vitae</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="The academic curriculum vitae of {{config:user}}">
   <link rel="stylesheet" href="../static/pagedJS/css/pagedjs.css">
   <link rel="stylesheet" href="../static/pagedJS/css/cv.css">
-  <script src="http://use.typekit.net/ria4wnw.js"></script>
-  <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
-  <script type="text/javascript" src="../static/pagedJS/js/pagedjs.js"></script>
+  <script src="https://use.typekit.net/ria4wnw.js"></script>
+  <script>try{Typekit.load();}catch(e){}</script>
+  <script>
+    /* signal to the printing process when Paged.js has finished laying
+       out the document, so that the PDF is only captured once rendering
+       is genuinely complete (this build of Paged.js calls
+       window.onPagesRendered when the flow is done) */
+    window.__pagedDone = false;
+    window.onPagesRendered = function () { window.__pagedDone = true; };
+  </script>
+  <script src="../static/pagedJS/js/pagedjs.js"></script>
 </head>
 
 <body>
-<div id="cassius-content">
+<main id="cassius-content">
 
 <div class="main">
   {{PersonInfo}}
@@ -68,7 +76,7 @@
   {{external:/home/martin/Documents/Programming/blogControl/musiccv.sh:/home/martin/Documents/Programming/blogControl/:/tmp/music.txt}}
 
 
-</div>
+</main>
 <article id="article">
 </article>
 

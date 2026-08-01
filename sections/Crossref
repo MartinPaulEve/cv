@@ -1,14 +1,16 @@
-<div class="section" id="olh">
+<div class="section" id="crossref">
 <h2 class="sectionheader">CROSSREF</h2>
 <p>In my time working at Crossref, I:</p>
 
-<p class="nobottom"><span class="prefix">&nbsp;</span>Built a tool to measure digital preservation across 7 million DOIs</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Productionized and deployed the multiple resolution and co-access tool, Chooser</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Conducted initial prototyping work of the Op Cit automatic digital preservation system</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Reported on content drift detection systems and state of the art in document difference detection</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Generated and managed the annual data file release including infrastructure</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Created format experiments and tools for the annual data file release</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Ran and managed the community books interest group</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Built and ran the Labs API system for prototyping new metadata schema</p>
-<p class="nobottom"><span class="prefix">&nbsp;</span>Wrote and managed the tools for importing Retraction Watch data into Crossref's system</p>
+<ul class="publist">
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Built a tool to measure digital preservation across 7 million DOIs</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Productionized and deployed the multiple resolution and co-access tool, Chooser</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Conducted initial prototyping work of the Op Cit automatic digital preservation system</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Reported on content drift detection systems and state of the art in document difference detection</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Generated and managed the annual data file release including infrastructure</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Created format experiments and tools for the annual data file release</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Ran and managed the community books interest group</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Built and ran the Labs API system for prototyping new metadata schema</li>
+	<li class="nobottom"><span class="prefix" aria-hidden="true">&nbsp;</span>Wrote and managed the tools for importing Retraction Watch data into Crossref's system</li>
+</ul>
 </div>

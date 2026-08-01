@@ -3,7 +3,7 @@
   <p id="cv" class="personinfo"><small><i>Curriculum Vitae</i></small></p>
   <p id="jobtitle" class="personinfo">Technical Lead, Knowledge Commons, Michigan State University</p>
   <p id="jobtitle2" class="personinfo">Professor of Literature, Technology and Publishing, Birkbeck, University of London</p>
-  <p class="personinfo">&nbsp;</p>
+  <p class="personinfo" aria-hidden="true">&nbsp;</p>
   <p id="address2" class="personinfo">School of Arts, 43 Gordon Square, London, WC1H 0PD</p>
   <p id="email" class="personinfo">email: <a href="mailto:martin.eve@bbk.ac.uk">martin.eve@bbk.ac.uk</a></p>
   <p id="email2" class="personinfo">email: <a href="mailto:evemartin@msu.edu">evemartin@msu.edu</a></p>

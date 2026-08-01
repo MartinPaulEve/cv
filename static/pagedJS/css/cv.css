@@ -54,6 +54,18 @@ html, body {
     margin-left: 1.05in;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 ul {
   list-style-type: none;
   list-style-position: inside;
@@ -85,7 +97,7 @@ div p.awardp:last-of-type {
   margin-bottom: 0.8rem;
 }
 
-div p span.bibitem {
+div p span.bibitem, li span.bibitem {
   margin-bottom: 0px;
   break-inside: avoid;
   text-indent: -0.5in;
@@ -115,8 +127,8 @@ sup {
 }
 
 a:link {
-  text-decoration: none;
-  color: #000;
+  text-decoration: underline;
+  color: #34539C;
 }
 
 h1, h2, h3, h4 {
@@ -182,16 +194,32 @@ p, ul {
   margin-bottom: 0.8rem;
   font-size: 11pt;
   font-family: "source-sans-pro", serif;
-  line-height: 130%;
-  text-align: justify;
+  /* WCAG 2.2 AAA (1.4.8): line spacing at least space-and-a-half and no
+     full justification; 165% keeps link touch targets at or above the
+     24 CSS pixel minimum of WCAG 2.5.8 at this font size */
+  line-height: 165%;
+  text-align: left;
 }
 
-div p.anitem {
+/* publication lists: no markers, no inherited hanging indent; the layout
+   comes from the prefix/bibitem columns inside each entry */
+ul.publist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+ul.publist li {
+  text-indent: 0;
+  padding-left: 0;
+}
+
+div p.anitem, li.anitem {
   margin-bottom: 0px;
   margin-top: 0px;
 }
 
-div p.genericitem:last-of-type {
+div p.genericitem:last-of-type, li.genericitem:last-of-type {
   margin-bottom: 0.8rem;
 }
 
@@ -200,7 +228,7 @@ div h1 ~ p.anitemnewdate:first-of-type {
   margin-bottom: 0px;
 }
 
-div p.anitemnewdate {
+div p.anitemnewdate, li.anitemnewdate {
   margin-top: 0.8rem;
   margin-bottom: 0px;
 }
