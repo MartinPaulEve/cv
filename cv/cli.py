@@ -48,6 +48,7 @@ from cv import __version__
 from cv.citeproc import CiteProc
 from cv.configuration import load_config, resolve_config_path
 from cv.repository import Repository
+from cv.sources import normalise_source_entries
 
 app = f"cv: the academic CV generator {__version__}"
 
@@ -69,6 +70,20 @@ def _configure_logging(debug):
     return logger
 
 
+def _display_name(config):
+    """The scholar's display name: the plaintext user, or a pre-encoded
+    eprints user from any configured repository entry, or a placeholder."""
+    name = getattr(config, "user", None)
+    if name:
+        return name
+
+    for entry in normalise_source_entries(getattr(config, "eprints", None)):
+        if entry.get("user"):
+            return entry["user"]
+
+    return "scholar"
+
+
 def main(argv=None):
     """Parse arguments, load the requested configuration, and dispatch."""
     args = docopt(__doc__, argv=argv, version=app)
@@ -77,8 +92,7 @@ def main(argv=None):
     logger.info(app)
 
     config = load_config(resolve_config_path(args["CONFIG"]))
-    display_name = getattr(config, "user", config.eprints.get("user", "scholar"))
-    logger.info(f"Building for {display_name}")
+    logger.info(f"Building for {_display_name(config)}")
 
     repo = Repository(config, logger, args["--refresh"])
     citeproc = CiteProc(repo, config, logger)

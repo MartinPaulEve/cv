@@ -277,6 +277,158 @@ class TestMultiSourceFetch:
             assert json.load(cached) == previous
 
 
+class TestMultipleRepositories:
+    def test_two_eprints_repositories_merge_with_the_first_as_primary(
+        self, fake_config, logger
+    ):
+        """Configs may list several eprints repositories; declaration order
+        is priority order, so the first repository's records are the base
+        and later ones fill gaps or append."""
+        fake_config.eprints = [
+            {"repo": "a.example.org"},
+            {"repo": "b.example.org"},
+        ]
+
+        payloads = {
+            "a.example.org": [
+                {"type": "book", "title": "Shared Book", "doi": "10.1/shared"}
+            ],
+            "b.example.org": [
+                {
+                    "type": "book",
+                    "title": "Shared Book (B)",
+                    "doi": "10.1/shared",
+                    "publisher": "B Press",
+                },
+                {"type": "book", "title": "B Only"},
+            ],
+        }
+
+        def fake_get(url, **kwargs):
+            class Response:
+                text = json.dumps(
+                    next(
+                        payload
+                        for host, payload in payloads.items()
+                        if host in url
+                    )
+                )
+
+                def raise_for_status(self):
+                    pass
+
+            return Response()
+
+        repo = Repository(fake_config, logger, refresh=True)
+        with patch("cv.sources.requests.get", side_effect=fake_get):
+            assert repo._populate_json(refresh=True) is True
+
+        titles = [item["title"] for item in repo.json]
+        assert titles == ["Shared Book", "B Only"]
+        # the shared record kept A's fields and gained B's publisher
+        assert repo.json[0]["publisher"] == "B Press"
+
+    def test_multiple_invenio_repositories_each_receive_their_own_entry(
+        self, fake_config, logger
+    ):
+        """With a list under `invenio`, one source is built per entry and
+        each sees its entry as a plain single-repository config."""
+        del fake_config.eprints
+        fake_config.invenio = [
+            {"api": "https://a.example.org/api/records"},
+            {"api": "https://b.example.org/api/records"},
+        ]
+
+        items_by_api = {
+            "https://a.example.org/api/records": [
+                {"type": "book", "title": "From A"}
+            ],
+            "https://b.example.org/api/records": [
+                {"type": "article", "title": "From B", "refereed": "TRUE"}
+            ],
+        }
+
+        class FakeInvenioSource:
+            def __init__(self, config, logger):
+                self.api = config.invenio["api"]
+
+            def fetch(self):
+                return items_by_api[self.api]
+
+        repo = Repository(fake_config, logger, refresh=True)
+        with patch("cv.repository.InvenioSource", FakeInvenioSource):
+            assert repo._populate_json(refresh=True) is True
+
+        assert [item["title"] for item in repo.json] == ["From A", "From B"]
+
+    def test_invenio_only_configuration_is_supported(self, fake_config, logger):
+        del fake_config.eprints
+        fake_config.invenio = {"api": "https://works.example.org/api/records"}
+        items = [{"type": "book", "title": "Invenio Book"}]
+
+        class FakeInvenioSource:
+            def __init__(self, config, logger):
+                pass
+
+            def fetch(self):
+                return items
+
+        repo = Repository(fake_config, logger, refresh=True)
+        assert repo.url is None
+
+        with patch("cv.repository.InvenioSource", FakeInvenioSource):
+            assert repo._populate_json(refresh=True) is True
+
+        assert repo.json == items
+
+    def test_no_configured_sources_is_a_configuration_error(
+        self, fake_config, logger
+    ):
+        del fake_config.eprints
+
+        repo = Repository(fake_config, logger, refresh=True)
+
+        assert repo._populate_json(refresh=True) is False
+        assert not os.path.exists(fake_config.storage["json"])
+
+    def test_eprints_repositories_take_priority_over_invenio(
+        self, fake_config, logger
+    ):
+        """All eprints entries come before all invenio entries, preserving
+        the historic precedence of eprints records."""
+        fake_config.invenio = {"api": "https://works.example.org/api/records"}
+
+        eprints_items = [
+            {"type": "book", "title": "Shared", "doi": "10.1/x"}
+        ]
+        invenio_items = [
+            {
+                "type": "book",
+                "title": "Shared (KC)",
+                "doi": "10.1/x",
+                "publisher": "KC Press",
+            }
+        ]
+
+        class FakeInvenioSource:
+            def __init__(self, config, logger):
+                pass
+
+            def fetch(self):
+                return invenio_items
+
+        repo = Repository(fake_config, logger, refresh=True)
+        with (
+            patch("cv.sources.requests.get") as mock_get,
+            patch("cv.repository.InvenioSource", FakeInvenioSource),
+        ):
+            mock_get.return_value.text = json.dumps(eprints_items)
+            assert repo._populate_json(refresh=True) is True
+
+        assert [item["title"] for item in repo.json] == ["Shared"]
+        assert repo.json[0]["publisher"] == "KC Press"
+
+
 class TestFetchPipeline:
     def test_fetch_writes_classified_sections_to_disk(self, repo, fake_config):
         """The core contract: fetch() splits repository JSON into per-type files."""
