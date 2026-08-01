@@ -1,0 +1,176 @@
+{
+  "style": "modern-humanities-research-association",
+  "locale": "en-GB",
+  "note": "Expected entries were produced by the retired node render-citations.js path (citeproc 2.4.x) and pin cross-toolchain output fidelity.",
+  "items": [
+    {
+      "id": "0-2015",
+      "type": "book",
+      "title": "Open Access and the Humanities: Contexts, Controversies and the Future",
+      "author": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        }
+      ],
+      "publisher": "Cambridge University Press",
+      "publisher-place": "Cambridge",
+      "issued": {
+        "date-parts": [
+          [
+            2014
+          ]
+        ]
+      }
+    },
+    {
+      "id": "1-2015",
+      "type": "book",
+      "title": "Password",
+      "author": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        }
+      ],
+      "publisher": "Bloomsbury Academic",
+      "publisher-place": "New York",
+      "issued": {
+        "date-parts": [
+          [
+            2016
+          ]
+        ]
+      }
+    },
+    {
+      "id": "2-2020",
+      "type": "book",
+      "title": "Reassembling Scholarly Communications",
+      "editor": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        },
+        {
+          "family": "Gray",
+          "given": "Jonathan"
+        }
+      ],
+      "publisher": "MIT Press",
+      "publisher-place": "Cambridge, MA",
+      "issued": {
+        "date-parts": [
+          [
+            2020
+          ]
+        ]
+      }
+    },
+    {
+      "id": "3-2017",
+      "type": "article-journal",
+      "title": "The Great Automatic Grammatizator: Writing, Labour, Computers",
+      "author": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        }
+      ],
+      "container-title": "Critical Quarterly",
+      "volume": 59,
+      "issue": 3,
+      "page": "39-54",
+      "DOI": "10.1111/criq.12359",
+      "issued": {
+        "date-parts": [
+          [
+            2017
+          ]
+        ]
+      }
+    },
+    {
+      "id": "4-2019",
+      "type": "chapter",
+      "title": "Violins in the Subway",
+      "author": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        }
+      ],
+      "editor": [
+        {
+          "family": "Smith",
+          "given": "Kathleen"
+        }
+      ],
+      "container-title": "Digital Technology and the Practices of Humanities Research",
+      "publisher": "Open Book Publishers",
+      "page": "249-278",
+      "issued": {
+        "date-parts": [
+          [
+            2019
+          ]
+        ]
+      }
+    },
+    {
+      "id": "5-2018",
+      "type": "paper-conference",
+      "title": "Scholarly Communications in the Age of Platforms",
+      "author": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        }
+      ],
+      "event": "STM Annual Conference",
+      "event-place": "London",
+      "publisher-place": "London",
+      "issued": {
+        "date-parts": [
+          [
+            2018,
+            4,
+            12
+          ]
+        ]
+      }
+    },
+    {
+      "id": "6-2021",
+      "type": "article-journal",
+      "title": "A Title with “Curly Quotes” and <i>Markup</i> — plus an em-dash",
+      "author": [
+        {
+          "family": "Eve",
+          "given": "Martin Paul"
+        },
+        {
+          "family": "O'Donnell",
+          "given": "Daniel"
+        }
+      ],
+      "container-title": "Journal of Edge Cases",
+      "issued": {
+        "date-parts": [
+          [
+            2021
+          ]
+        ]
+      }
+    }
+  ],
+  "expected": [
+    "  <div class=\"csl-entry\">Eve, Martin Paul, <i>Open Access and the Humanities: Contexts, Controversies and the Future</i> (Cambridge: Cambridge University Press, 2014)</div>\n",
+    "  <div class=\"csl-entry\">Eve, Martin Paul, <i>Password</i> (New York: Bloomsbury Academic, 2016)</div>\n",
+    "  <div class=\"csl-entry\">Eve, Martin Paul, and Jonathan Gray, eds., <i>Reassembling Scholarly Communications</i> (Cambridge, MA: MIT Press, 2020)</div>\n",
+    "  <div class=\"csl-entry\">Eve, Martin Paul, ‘The Great Automatic Grammatizator: Writing, Labour, Computers’, <i>Critical Quarterly</i>, 59.3 (2017), 39–54 &#60;https://doi.org/10.1111/criq.12359&#62;</div>\n",
+    "  <div class=\"csl-entry\">Eve, Martin Paul, ‘Violins in the Subway’, in <i>Digital Technology and the Practices of Humanities Research</i>, ed. by Kathleen Smith (Open Book Publishers, 2019), pp. 249–78</div>\n",
+    "  <div class=\"csl-entry\">Eve, Martin Paul, ‘Scholarly Communications in the Age of Platforms’ (presented at the STM Annual Conference, London, 2018)</div>\n",
+    "  <div class=\"csl-entry\">Eve, Martin Paul, and Daniel O’Donnell, ‘A Title with “Curly Quotes” and <i>Markup</i> — plus an Em-Dash’, <i>Journal of Edge Cases</i>, 2021</div>\n"
+  ]
+}
