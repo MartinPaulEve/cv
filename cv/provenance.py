@@ -11,9 +11,33 @@ cached data, so every fetch leaves an auditable trail.
 """
 
 import os
+import unicodedata
 from datetime import datetime
 
 UNTITLED = "(untitled)"
+
+_ESCAPES = {"\n": "\\n", "\r": "\\r", "\t": "\\t"}
+
+
+def _clean(value):
+    """
+    Make a value safe to interpolate into one log line. Metadata arrives
+    from remote repositories, so a crafted title or query containing
+    newlines could otherwise forge entries in the audit trail; control
+    and format characters are rendered as visible escapes instead of
+    being obeyed, so nothing is silently lost either.
+    :param value: the value to sanitise
+    :return: a single-line string with control characters escaped
+    """
+    cleaned = []
+    for char in str(value):
+        if char in _ESCAPES:
+            cleaned.append(_ESCAPES[char])
+        elif unicodedata.category(char) in ("Cc", "Cf"):
+            cleaned.append(f"\\u{ord(char):04x}")
+        else:
+            cleaned.append(char)
+    return "".join(cleaned)
 
 
 class ProvenanceRecorder:
@@ -48,8 +72,8 @@ class ProvenanceRecorder:
         :param mode: the combine mode the search ran under
         """
         self._source_searches(source_name).append(
-            f"strategy '{strategy}' (mode: {mode}): {query} "
-            f"-> {count} records"
+            f"strategy '{_clean(strategy)}' (mode: {_clean(mode)}): "
+            f"{_clean(query)} -> {count} records"
         )
 
     def search_skipped(self, source_name, strategy, reason):
@@ -60,7 +84,7 @@ class ProvenanceRecorder:
         :param reason: why it was skipped
         """
         self._source_searches(source_name).append(
-            f"strategy '{strategy}': skipped ({reason})"
+            f"strategy '{_clean(strategy)}': skipped ({_clean(reason)})"
         )
 
     def record_skipped(self, source_name, identifier, reason):
@@ -110,7 +134,7 @@ class ProvenanceRecorder:
         lines += ["", "== Searches ==", ""]
         if self._searches:
             for source_name, searches in self._searches.items():
-                lines.append(f"[{source_name}]")
+                lines.append(f"[{_clean(source_name)}]")
                 lines += [f"  - {search}" for search in searches]
                 lines.append("")
         else:
@@ -119,7 +143,8 @@ class ProvenanceRecorder:
         lines += ["== Skipped records ==", ""]
         if self._skipped_records:
             lines += [
-                f"  - {source_name}: record {identifier} skipped ({reason})"
+                f"  - {_clean(source_name)}: record {_clean(identifier)} "
+                f"skipped ({_clean(reason)})"
                 for source_name, identifier, reason in self._skipped_records
             ]
         else:
@@ -136,20 +161,19 @@ class ProvenanceRecorder:
         return "\n".join(lines)
 
     def _render_item(self, title, item):
-        lines = [f"KEPT: '{title}'"]
+        lines = [f"KEPT: '{_clean(title)}'"]
 
         if item["base"]:
-            lines.append(f"  - base record from {item['base']}")
+            lines.append(f"  - base record from {_clean(item['base'])}")
 
         for source_name, fields in item["fills"]:
-            lines.append(
-                f"  - {', '.join(sorted(fields))} filled from {source_name}"
-            )
+            fields = ", ".join(sorted(_clean(field) for field in fields))
+            lines.append(f"  - {fields} filled from {_clean(source_name)}")
 
         for source_name, discarded_title, reason in item["discards"]:
             lines.append(
-                f"  - {source_name} record '{discarded_title}' discarded "
-                f"as duplicate ({self._reason_text(reason)})"
+                f"  - {_clean(source_name)} record '{_clean(discarded_title)}' "
+                f"discarded as duplicate ({self._reason_text(reason)})"
             )
 
         lines.append("")
@@ -159,7 +183,7 @@ class ProvenanceRecorder:
     def _reason_text(reason):
         kind, value = reason
         if kind == "doi":
-            return f"DOI {value} matched"
+            return f"DOI {_clean(value)} matched"
         return "title matched"
 
 

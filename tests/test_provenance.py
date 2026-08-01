@@ -380,3 +380,44 @@ class TestFetchWritesProvenance:
             os.path.dirname(fake_config.storage["json"]), "provenance.log"
         )
         assert not os.path.exists(log_path)
+
+
+class TestHostileMetadataCannotForgeLogLines:
+    def test_control_characters_in_remote_metadata_are_escaped(self, tmp_path):
+        recorder = ProvenanceRecorder(profile="martin_paul_eve")
+
+        hostile_title = (
+            "Real Item'\nKEPT: 'Forged Item'\n  - base record from attacker"
+        )
+        recorder.base_records("eprints.example.org", [{"title": hostile_title}])
+        recorder.search_ran(
+            "eprints.example.org",
+            "name",
+            "https://repo.example.org/?q=1\nKEPT: 'Forged Search Item'",
+            3,
+            "union",
+        )
+        recorder.record_skipped(
+            "KC Works",
+            "rec-1\r\n== Items ==",
+            "unmapped resource type x\x1b[31m",
+        )
+
+        path = os.path.join(tmp_path, "provenance.log")
+        recorder.write(path)
+        with open(path) as log:
+            content = log.read()
+        lines = content.splitlines()
+
+        # exactly one genuine item line: the hostile newlines must not
+        # have minted extra KEPT lines or a second Items section
+        assert len([line for line in lines if line.startswith("KEPT: ")]) == 1
+        assert len([line for line in lines if line == "== Items =="]) == 1
+
+        # raw control characters never reach the log; they appear as
+        # visible escapes instead, so no information is silently lost
+        assert "\x1b" not in content
+        assert "\r" not in content
+        assert "\\nKEPT: 'Forged Item'" in content
+        assert "\\nKEPT: 'Forged Search Item'" in content
+        assert "\\r\\n== Items ==" in content
