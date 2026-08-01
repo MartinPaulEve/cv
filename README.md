@@ -89,9 +89,15 @@ uv run cv make martin_paul_eve pdf html
 
 The tool includes two output options by default, "html" and "pdf".
 
-The `fetch` mode pulls publication metadata from the remote repository (or the
-on-disk cache in `data/`, unless `--refresh` is given); the `make` mode builds
-the configured outputs from that cached data without touching the network.
+The `fetch` mode pulls publication metadata from the remote repositories (or
+the on-disk cache in `data/`, unless `--refresh` is given); the `make` mode
+builds the configured outputs from that cached data without touching the
+network. Each fetch from the remote repositories also writes a human-readable
+`provenance.log` next to the cached data recording, per repository, the
+searches run and how many records each returned, and, per item, which
+repository provided the base record, which repositories filled which fields
+during merging, and which duplicate copies were discarded and why (DOI or
+title match).
 
 Citations are formatted in-process with [citeproc-js](https://github.com/Juris-M/citeproc-js)
 (installed by `npm ci`); the CSL style and locale are vendored in `static/csl`,
