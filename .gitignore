@@ -176,6 +176,5 @@ venv.bak/
 
 data
 output
-# IDE and node
+# IDE
 .idea/
-node_modules/
