@@ -1,11 +1,13 @@
 # cv
 
 This tool builds a PDF and an HTML CV from the metadata held about a scholar
-in institutional repositories. It can pull from an eprints repository and
-from any InvenioRDM repository (KC Works, Zenodo, and others), merging the
-results and deduplicating records that were deposited in more than one
-place (by DOI, with a title fallback for deposits that carry no DOI; the
-eprints record is preferred and its gaps are filled from the other copy).
+in institutional repositories. It can pull from any number of eprints
+repositories and InvenioRDM repositories (KC Works, Zenodo, and others),
+merging the results and deduplicating records that were deposited in more
+than one place (by DOI, with a title fallback for deposits that carry no
+DOI). Repositories are ranked in the order they are declared in the
+configuration, with eprints entries before InvenioRDM entries: the first
+repository's record is preferred and its gaps are filled from later copies.
 
 Both outputs are designed to support WCAG 2.2 AAA accessibility: semantic
 list and landmark structure, AAA contrast, accessible link names, and a
@@ -48,7 +50,11 @@ directory: `cv fetch martin_paul_eve` finds `config/martin_paul_eve.py`.
 To set up your own CV, copy `config/config.py.example` to
 `config/<your_name>.py` and fill in the identity block at the top: your
 name in plain text, your email addresses, and your ORCID. The eprints
-person identifier is derived from your name automatically. The rest of
+person identifier is derived from your name automatically. The `eprints`
+and `invenio` variables each accept a single repository entry or a list
+of them, so any number of repositories of each type can be merged; each
+entry may carry an optional human-readable `name` (used in logs),
+defaulting to the repository hostname. The rest of
 the file defines your CV's layout: sections, headings, templates, and
 outputs are all per-user configuration.
 
