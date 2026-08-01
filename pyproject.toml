@@ -16,6 +16,7 @@ dependencies = [
 
 [project.scripts]
 cv = "cv.cli:run"
+cv-print = "cv.printpdf:run"
 
 [dependency-groups]
 dev = [
@@ -51,3 +52,6 @@ ignore = ["SIM114"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "browser: tests that launch a real headless Chromium via Playwright",
+]
