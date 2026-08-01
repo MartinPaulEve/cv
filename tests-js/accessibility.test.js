@@ -31,8 +31,24 @@ test('print links remain visually distinguishable from body text', async () => {
       };
     });
 
-    assert.equal(styles.color, 'rgb(52, 83, 156)');
+    // Links must carry a non-color affordance (WCAG 1.4.1) and meet the
+    // AAA 7:1 contrast ratio against the white page (WCAG 1.4.6). The
+    // exact color is a design choice and deliberately not pinned here.
     assert.match(styles.decoration, /underline/);
+    const channels = styles.color
+      .match(/\d+/g)
+      .slice(0, 3)
+      .map((value) => {
+        const c = Number(value) / 255;
+        return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+      });
+    const luminance =
+      0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    const contrast = (1.0 + 0.05) / (luminance + 0.05);
+    assert.ok(
+      contrast >= 7,
+      `link contrast ${contrast.toFixed(2)}:1 is below the AAA 7:1 minimum`
+    );
   } finally {
     await browser.close();
   }

@@ -126,9 +126,14 @@ sup {
   color: #000;
 }
 
-a:link {
+a:link, a:visited {
+  /* Black links stay AAA: the underline is the non-color affordance
+     WCAG 1.4.1 requires, and #000 on white is 21:1 contrast. */
+  color: #000;
   text-decoration: underline;
-  color: #34539C;
+  text-decoration-color: #767676;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.15em;
 }
 
 h1, h2, h3, h4 {
