@@ -120,9 +120,9 @@ sup {
 a:link, a:visited {
   color: #000;
   text-decoration: underline;
-  text-decoration-color: #767676;
-  text-decoration-thickness: 0.06em;
-  text-underline-offset: 0.15em;
+  text-decoration-color: #b0b0b0;
+  text-decoration-thickness: 0.045em;
+  text-underline-offset: 0.18em;
 }
 
 h1, h2, h3, h4 {
