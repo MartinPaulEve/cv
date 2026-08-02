@@ -1,3 +1,9 @@
+## 1.8.0 (2026-08-02)
+
+### Feat
+
+- **citations**: link only the item title in PDF entries
+
 ## 1.7.0 (2026-08-02)
 
 ### Feat
