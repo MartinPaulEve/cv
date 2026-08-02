@@ -53,6 +53,29 @@ eprints = {'repo': 'eprints.example.ac.uk'}
 # alone.
 invenio = {'api': 'https://works.hcommons.org/api/records'}
 
+# Any repository entry may also carry a 'search' key customising how the
+# scholar's records are located there. A bare list is an ordered fallback
+# chain (run each strategy in turn, stop at the first that returns any
+# records); the dict form names the strategies and a combine mode —
+# 'union' runs every strategy and merges the results, 'first' stops at
+# the first that finds anything:
+#
+#   eprints = {'repo': 'eprints.example.ac.uk',
+#              'search': ['email', 'name']}
+#   invenio = {'api': 'https://works.hcommons.org/api/records',
+#              'search': {'strategies': ['orcid'], 'mode': 'first'}}
+#
+# eprints strategies: 'name' (person identifier derived from `user`),
+# 'user' (pre-encoded person identifier from the entry's 'user' key), and
+# 'email' (a browse view keyed by each address in `emails`; the view path
+# is configurable per entry as 'email_view', default 'creators_email').
+# InvenioRDM strategies: 'name', 'orcid', and 'query:<raw query string>'
+# as an escape hatch for anything else. Unknown strategies, or strategies
+# the configuration cannot support (e.g. 'orcid' with no orcid set), fail
+# loudly at fetch time. With no 'search' key each repository keeps its
+# default: eprints by person identifier; InvenioRDM by name unioned with
+# the ORCID where one is configured.
+
 # ---------------------------------------------------------------------------
 # Section definitions
 # ---------------------------------------------------------------------------

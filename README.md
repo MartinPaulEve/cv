@@ -55,7 +55,14 @@ person identifier is derived from your name automatically. The `eprints`
 and `invenio` variables each accept a single repository entry or a list
 of them, so any number of repositories of each type can be merged; each
 entry may carry an optional human-readable `name` (used in logs),
-defaulting to the repository hostname. The rest of
+defaulting to the repository hostname. An entry may also carry a
+`search` key selecting how records are located in that repository: an
+ordered list of strategies (for eprints: `name`, `user`, `email`; for
+InvenioRDM: `name`, `orcid`, or a `query:<raw query>` escape hatch) with
+a combine mode of `union` (run all, merge results) or `first` (stop at
+the first strategy that returns records). Without a `search` key each
+repository keeps its default behaviour; see `config/config.py.example`
+for the exact shapes. The rest of
 the file defines your CV's layout: sections, headings, templates, and
 outputs are all per-user configuration.
 
