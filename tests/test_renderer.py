@@ -287,3 +287,48 @@ class TestTitleLinks:
 
         assert "<a " in linked
         assert "<a " not in plain
+
+
+class TestDoiLinks:
+    """Integration: displayed DOIs become links in title-link mode."""
+
+    ITEM = {
+        "id": "doi-1",
+        "type": "article-journal",
+        "title": "Equivocationary Horseshit",
+        "author": [{"family": "Eve", "given": "Martin Paul"}],
+        "issued": {"date-parts": [[2020]]},
+        "container-title": "Open Library of Humanities",
+        "volume": 6,
+        "issue": 1,
+        "DOI": "10.16995/olh.538",
+        "link": "https://doi.org/10.16995/olh.538",
+    }
+
+    STYLE = "modern-humanities-research-association"
+
+    def test_displayed_doi_is_linked_to_the_resolver(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        [entry] = renderer.render([self.ITEM], self.STYLE, link_titles=True)
+
+        assert (
+            '<a href="https://doi.org/10.16995/olh.538">'
+            "https://doi.org/10.16995/olh.538</a>" in entry
+        )
+        # the style's angle brackets stay outside the anchor as text
+        assert "&#60;<a href=" in entry
+        assert "</a>&#62;" in entry
+
+    def test_title_and_doi_are_separate_links(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        [entry] = renderer.render([self.ITEM], self.STYLE, link_titles=True)
+
+        assert entry.count("<a ") == 2
+        assert "<a href=" in entry.split("Open Library")[0]  # title link
+
+    def test_entry_mode_leaves_the_doi_as_plain_text(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        [entry] = renderer.render([self.ITEM], self.STYLE)
+
+        assert "<a " not in entry
+        assert "https://doi.org/10.16995/olh.538" in entry
