@@ -27,8 +27,12 @@ def doubles(monkeypatch, fake_config):
 
     monkeypatch.setattr(cli, "Repository", MagicMock(return_value=repo_instance))
     monkeypatch.setattr(cli, "CiteProc", MagicMock(return_value=citeproc_instance))
+    def fake_load(path, output_name=None):
+        resolved["output_name"] = output_name
+        return fake_config
+
     monkeypatch.setattr(cli, "resolve_config_path", fake_resolve)
-    monkeypatch.setattr(cli, "load_config", lambda path: fake_config)
+    monkeypatch.setattr(cli, "load_config", fake_load)
 
     return repo_instance, citeproc_instance, resolved
 
@@ -101,3 +105,17 @@ def test_legacy_config_uses_pre_encoded_user_as_display_name(doubles, fake_confi
     fake_config.eprints["user"] = "Legacy=3APerson=3A=3A"
 
     assert cli.main(["fetch", "legacy"]) == 0
+
+
+def test_make_output_name_reaches_the_config_loader(doubles):
+    _, citeproc, resolved = doubles
+    citeproc.build.return_value = True
+    cli.main(["make", "jane_doe", "html", "--output", "123"])
+    assert resolved["output_name"] == "123"
+
+
+def test_make_without_output_name_loads_the_config_plainly(doubles):
+    _, citeproc, resolved = doubles
+    citeproc.build.return_value = True
+    cli.main(["make", "jane_doe", "html"])
+    assert resolved["output_name"] is None

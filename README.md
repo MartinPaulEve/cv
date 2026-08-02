@@ -34,7 +34,7 @@ cv: build an academic CV, as HTML and PDF, from institutional repositories.
 
 Usage:
   cv fetch CONFIG [TYPES ...] [--debug] [--refresh]
-  cv make CONFIG OUTPUT_TYPES... [--debug]
+  cv make CONFIG OUTPUT_TYPES... [--debug] [--output=NAME]
   cv (-h | --help)
   cv --version
 
@@ -43,6 +43,8 @@ Options:
   --version     Show version.
   --debug       Enable debug output.
   --refresh     Delete cached versions and do a hard refresh from the repository.
+  --output=NAME  Base name for the generated files: --output 123 writes
+                 123.html and 123.pdf into the output directory.
 ```
 
 CONFIG selects the scholar to build a CV for. It may be a path to a

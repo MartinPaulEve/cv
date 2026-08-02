@@ -40,10 +40,14 @@ def resolve_config_path(name, config_dir=None):
     )
 
 
-def load_config(path):
+def load_config(path, output_name=None):
     """
     Load a configuration module from a file path
     :param path: the path of the configuration file
+    :param output_name: an optional base name for generated output files;
+        when given it replaces the configured document name (so `123`
+        yields 123.html, 123-PDF.html, 123.pdf) instead of the
+        profile-prefixed defaults
     :return: the loaded module
     """
     path = os.path.abspath(path)
@@ -67,13 +71,23 @@ def load_config(path):
         for rule, configured in module.output_rules.items():
             ruleset = list(configured)
             ruleset[0] = str(_project_path(ruleset[0]))
-            ruleset[1] = str(
-                _project_path(_profile_output_path(ruleset[1], module.profile))
-            )
-            ruleset[2:] = [
-                _namespace_command_outputs(command, module.profile)
-                for command in ruleset[2:]
-            ]
+            if output_name:
+                stem = _final_artifact_stem(ruleset)
+                ruleset[1] = str(
+                    _project_path(_renamed_path(ruleset[1], stem, output_name))
+                )
+                ruleset[2:] = [
+                    _rename_command_outputs(command, stem, output_name)
+                    for command in ruleset[2:]
+                ]
+            else:
+                ruleset[1] = str(
+                    _project_path(_profile_output_path(ruleset[1], module.profile))
+                )
+                ruleset[2:] = [
+                    _namespace_command_outputs(command, module.profile)
+                    for command in ruleset[2:]
+                ]
             output_rules[rule] = ruleset
         module.output_rules = output_rules
 
@@ -100,6 +114,40 @@ def _profile_output_path(path, profile):
     if path.is_absolute() or path.name.startswith(f"{profile}-"):
         return path
     return path.with_name(f"{profile}-{path.name}")
+
+
+_COMMAND_OUTPUT_PATTERN = re.compile(r"output/[^\s'\"]+")
+
+
+def _final_artifact_stem(ruleset):
+    """
+    The file stem of the rule's final artifact: the last output path
+    named in its post-processing commands, or the output file itself for
+    rules with no commands. Intermediate artifacts share this stem plus
+    a suffix (CV-PDF.html against CV.pdf), so it is the part an output
+    name replaces.
+    :param ruleset: the [template, output_file, *commands] rule list
+    :return: the stem of the rule's final artifact
+    """
+    paths = [ruleset[1]]
+    for command in ruleset[2:]:
+        paths += _COMMAND_OUTPUT_PATTERN.findall(command)
+    return Path(paths[-1]).stem
+
+
+def _renamed_path(path, stem, output_name):
+    """Swap a path's leading document stem for the output name."""
+    path = Path(path)
+    if path.stem.startswith(stem):
+        return path.with_name(output_name + path.stem[len(stem) :] + path.suffix)
+    return path
+
+
+def _rename_command_outputs(command, stem, output_name):
+    def replace(match):
+        return str(_renamed_path(match.group(0), stem, output_name))
+
+    return _COMMAND_OUTPUT_PATTERN.sub(replace, command)
 
 
 def _namespace_command_outputs(command, profile):

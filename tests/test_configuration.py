@@ -111,3 +111,39 @@ class TestEprintsUserEncoding:
 
     def test_surrounding_whitespace_is_ignored(self):
         assert encode_eprints_user("  Jane Doe  ") == "Doe=3AJane=3A=3A"
+
+
+class TestOutputName:
+    @pytest.fixture
+    def config_file(self, config_dir):
+        (config_dir / "jane_doe.py").write_text(
+            'user = "Jane Doe"\n'
+            "output_rules = {"
+            '"html": ["templates/HTML", "output/CV.html"],'
+            '"pdf": ["templates/PDF", "output/CV-PDF.html",'
+            ' "uv run cv-print output/CV-PDF.html output/CV.pdf"]}\n'
+        )
+        return str(config_dir / "jane_doe.py")
+
+    def test_output_name_becomes_the_final_artifact_basename(self, config_file):
+        config = load_config(config_file, output_name="123")
+        assert config.output_rules["html"][1].endswith("output/123.html")
+        assert config.output_rules["pdf"][2].endswith("output/123.pdf")
+
+    def test_intermediate_artifacts_keep_their_suffixes(self, config_file):
+        config = load_config(config_file, output_name="123")
+        assert config.output_rules["pdf"][1].endswith("output/123-PDF.html")
+        assert "output/123-PDF.html" in config.output_rules["pdf"][2]
+
+    def test_output_name_is_not_profile_prefixed(self, config_file):
+        config = load_config(config_file, output_name="123")
+        assert "jane_doe-" not in config.output_rules["html"][1]
+        assert "jane_doe-" not in config.output_rules["pdf"][2]
+
+    def test_templates_are_untouched_by_the_output_name(self, config_file):
+        config = load_config(config_file, output_name="123")
+        assert Path(config.output_rules["html"][0]) == PROJECT_ROOT / "templates/HTML"
+
+    def test_without_an_output_name_profile_naming_is_unchanged(self, config_file):
+        config = load_config(config_file)
+        assert config.output_rules["html"][1].endswith("output/jane_doe-CV.html")
