@@ -1,3 +1,9 @@
+## 1.3.0 (2026-08-02)
+
+### Feat
+
+- **sources**: support any number of repositories of each type
+
 ## 1.2.0 (2026-08-01)
 
 ### Feat
