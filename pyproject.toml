@@ -1,6 +1,6 @@
 [project]
 name = "cv"
-version = "1.8.0"
+version = "1.9.0"
 description = "Build an accessible academic CV, as HTML and PDF, from institutional repository metadata"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -33,7 +33,7 @@ build-backend = "hatchling.build"
 packages = ["cv"]
 
 [tool.commitizen]
-version = "1.8.0"
+version = "1.9.0"
 version_files = [
     "__version__.py",
     "pyproject.toml:version"

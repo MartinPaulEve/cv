@@ -1,3 +1,13 @@
+## 1.9.0 (2026-08-02)
+
+### Feat
+
+- **citations**: link displayed DOIs to their resolver
+
+### Fix
+
+- **citations**: derive display DOIs from id_number and official_url
+
 ## 1.8.0 (2026-08-02)
 
 ### Feat
