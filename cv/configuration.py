@@ -71,7 +71,22 @@ def load_config(path, output_name=None):
         for rule, configured in module.output_rules.items():
             ruleset = list(configured)
             ruleset[0] = str(_project_path(ruleset[0]))
-            if output_name:
+            if _is_filename_less(ruleset):
+                stem = output_name or module.profile
+                final = f"output/{stem}.{rule}"
+                written = (
+                    final
+                    if len(ruleset) == 1
+                    else f"output/{stem}-{rule.upper()}.html"
+                )
+                ruleset[1:] = [
+                    command.replace("[[source]]", written).replace(
+                        "[[output]]", final
+                    )
+                    for command in ruleset[1:]
+                ]
+                ruleset.insert(1, str(_project_path(written)))
+            elif output_name:
                 stem = _final_artifact_stem(ruleset)
                 ruleset[1] = str(
                     _project_path(_renamed_path(ruleset[1], stem, output_name))
@@ -117,6 +132,21 @@ def _profile_output_path(path, profile):
 
 
 _COMMAND_OUTPUT_PATTERN = re.compile(r"output/[^\s'\"]+")
+
+
+def _is_filename_less(ruleset):
+    """
+    Whether an output rule omits its output filename. Such a rule is just
+    a template, optionally followed by post-processing commands that
+    refer to the derived paths as [[source]] and [[output]]; a command is
+    recognisable because a bare output path never contains spaces or
+    placeholders.
+    :param ruleset: the rule list with its template already resolved
+    :return: True for the filename-less form
+    """
+    if len(ruleset) == 1:
+        return True
+    return "[[" in ruleset[1] or " " in ruleset[1]
 
 
 def _final_artifact_stem(ruleset):
