@@ -388,3 +388,61 @@ class TestTitleLinkMode:
         assert section.count("<a ") == 1
         assert '<span class="csl-entry">' in section
         assert '<div class="csl-entry"' not in section
+
+
+class TestDoiDerivation:
+    def build(self, processor, item):
+        return processor._build_csl_item(item, 0, "books", 2020, "html")
+
+    def test_explicit_doi_field_wins(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "doi": "10.1000/explicit",
+            "id_number": "10.1000/other",
+            "official_url": "https://doi.org/10.1000/another",
+        })
+        assert csl["DOI"] == "10.1000/explicit"
+
+    def test_bare_doi_in_id_number_is_used(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "id_number": "10.59348/vrt01-f3b49",
+        })
+        assert csl["DOI"] == "10.59348/vrt01-f3b49"
+
+    def test_resolver_url_in_id_number_is_reduced_to_the_doi(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "id_number": "https://doi.org/10.59348/r3x69-k5d70",
+        })
+        assert csl["DOI"] == "10.59348/r3x69-k5d70"
+
+    def test_resolver_official_url_is_reduced_to_the_doi(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "official_url": "https://doi.org/10.16995/olh.538",
+        })
+        assert csl["DOI"] == "10.16995/olh.538"
+
+    def test_id_number_is_preferred_over_official_url(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "id_number": "10.1000/from-id",
+            "official_url": "https://doi.org/10.1000/from-url",
+        })
+        assert csl["DOI"] == "10.1000/from-id"
+
+    def test_non_doi_identifiers_yield_no_doi(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "id_number": "ISBN 978-1-234",
+            "official_url": "https://example.org/page",
+        })
+        assert "DOI" not in csl
+
+    def test_doi_case_is_preserved_for_display(self, processor):
+        csl = self.build(processor, {
+            "type": "book", "title": "T", "uri": "u",
+            "id_number": "doi:10.1000/MiXeD-Case",
+        })
+        assert csl["DOI"] == "10.1000/MiXeD-Case"

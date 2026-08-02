@@ -41,24 +41,40 @@ function __render(itemsJson, linkTitles) {
 }
 """
 
-# wraps just the rendered title in a link to the item when title-link
-# mode is on; everything else in the citation stays plain text
+# wraps the rendered title in a link to the item, and a displayed DOI in
+# a link to its resolver, when title-link mode is on; everything else in
+# the citation stays plain text
 _VARIABLE_WRAPPER = """
 var __linkTitles = false;
 
+function __escapeHref(href) {
+    return String(href).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+}
+
 function __variableWrapper(params, prePunct, str, postPunct) {
-    if (
-        __linkTitles
-        && params.variableNames[0] === 'title'
-        && params.context === 'bibliography'
-        && params.itemData.link
-    ) {
-        var href = String(params.itemData.link)
-            .replace(/&/g, '&amp;')
-            .replace(/"/g, '&quot;');
+    if (!__linkTitles || params.context !== 'bibliography') {
+        return prePunct + str + postPunct;
+    }
+
+    if (params.variableNames[0] === 'title' && params.itemData.link) {
+        var href = __escapeHref(params.itemData.link);
         return prePunct + '<a href="' + href + '">' + str + '</a>'
             + postPunct;
     }
+
+    if (params.variableNames[0] === 'DOI' && params.itemData.DOI) {
+        // the style renders the resolver URL wrapped in (escaped) angle
+        // brackets; those stay plain text around the anchor
+        var doiHref = __escapeHref(
+            'https://doi.org/' + String(params.itemData.DOI)
+        );
+        var parts = str.match(/^(&#60;|&lt;|<)?([\\s\\S]*?)(&#62;|&gt;|>)?$/);
+        var wrapped = (parts[1] || '')
+            + '<a href="' + doiHref + '">' + parts[2] + '</a>'
+            + (parts[3] || '');
+        return prePunct + wrapped + postPunct;
+    }
+
     return prePunct + str + postPunct;
 }
 """

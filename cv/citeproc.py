@@ -497,11 +497,38 @@ class CiteProc:
         return output_string, current_date
 
     def _build_identifier(self, identifier, item, items, rule):
-        if "doi" in item:
-            items[identifier]["DOI"] = item["doi"]
+        doi = self._derive_doi(item)
+        if doi:
+            items[identifier]["DOI"] = doi
 
         # setup official links for gold OA
         self._link_to_official_url_if_gold_oa(item, rule)
+
+    @staticmethod
+    def _derive_doi(item):
+        """
+        The item's DOI for display. eprints records often carry no doi
+        field: the DOI hides in id_number, or in a doi.org resolver URL
+        recorded as the official_url, so those are fallbacks. Case is
+        preserved because this value is displayed, not compared.
+        :param item: the repository item
+        :return: a bare DOI string, or None when the item has none
+        """
+        if item.get("doi"):
+            return item["doi"]
+
+        for field in ("id_number", "official_url"):
+            candidate = str(item.get(field, "") or "").strip()
+            candidate = re.sub(
+                r"^(doi:|https?://(dx\.)?doi\.org/)",
+                "",
+                candidate,
+                flags=re.IGNORECASE,
+            )
+            if re.match(r"^10\.\d{4,}/\S+$", candidate):
+                return candidate
+
+        return None
 
     def _build_publisher(self, identifier, item, items):
         if "publisher" in item:
