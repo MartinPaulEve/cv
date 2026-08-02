@@ -286,3 +286,9 @@ li.ref-content {
 div.footnote p {
 	text-indent: 0in;
 }
+
+/* the page number: lifted slightly off the bottom edge and pushed toward
+   the right edge so its right gap matches its bottom gap */
+.pagedjs_margin-bottom-right > .pagedjs_margin-content {
+  transform: translate(61pt, -7pt);
+}
