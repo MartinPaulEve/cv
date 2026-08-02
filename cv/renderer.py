@@ -21,9 +21,11 @@ PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CITEPROC_PATH = os.path.join(PROJECT_ROOT, "static", "js", "citeproc_commonjs.js")
 
 _RENDER_FUNCTION = """
-function __render(itemsJson) {
+function __render(itemsJson, linkTitles) {
     var items = JSON.parse(itemsJson);
     var entries = [];
+
+    __linkTitles = Boolean(linkTitles);
 
     for (var i = 0; i < items.length; i++) {
         __items[items[i].id] = items[i];
@@ -36,6 +38,28 @@ function __render(itemsJson) {
     }
 
     return JSON.stringify(entries);
+}
+"""
+
+# wraps just the rendered title in a link to the item when title-link
+# mode is on; everything else in the citation stays plain text
+_VARIABLE_WRAPPER = """
+var __linkTitles = false;
+
+function __variableWrapper(params, prePunct, str, postPunct) {
+    if (
+        __linkTitles
+        && params.variableNames[0] === 'title'
+        && params.context === 'bibliography'
+        && params.itemData.link
+    ) {
+        var href = String(params.itemData.link)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;');
+        return prePunct + '<a href="' + href + '">' + str + '</a>'
+            + postPunct;
+    }
+    return prePunct + str + postPunct;
 }
 """
 
@@ -62,18 +86,22 @@ class CiteprocEngine:
 
         self._context.eval(f"var __locale = {json.dumps(locale)};")
         self._context.eval("var __items = {};")
+        self._context.eval(_VARIABLE_WRAPPER)
         self._context.eval(
             "var __engine = new CSL.Engine({"
             "retrieveLocale: function () { return __locale; },"
-            "retrieveItem: function (id) { return __items[id]; }"
+            "retrieveItem: function (id) { return __items[id]; },"
+            "variableWrapper: __variableWrapper"
             f"}}, {json.dumps(style)});"
         )
         self._context.eval(_RENDER_FUNCTION)
 
-    def render(self, items):
+    def render(self, items, link_titles=False):
         """
         Format CSL-JSON items, each as a single-entry bibliography
         :param items: a list of CSL-JSON item dictionaries
+        :param link_titles: whether to wrap each rendered title in a link
+            to the item's `link` value
         :return: a list of formatted HTML entries, one per item, in order
         """
         # callers reuse positional item ids across batches, so hand the
@@ -84,7 +112,9 @@ class CiteprocEngine:
             self._serial += 1
             prepared.append({**item, "id": f"cv-item-{self._serial}"})
 
-        rendered = self._context.call("__render", json.dumps(prepared))
+        rendered = self._context.call(
+            "__render", json.dumps(prepared), link_titles
+        )
 
         return json.loads(rendered)
 
@@ -105,14 +135,17 @@ class CitationRenderer:
         locale = self.config.citeproc_locale
         return os.path.join(self.config.csl_directory, f"locales-{locale}.xml")
 
-    def render(self, items, style):
+    def render(self, items, style, link_titles=False):
         """
         Format CSL-JSON items as bibliography entries
         :param items: a list of CSL-JSON item dictionaries
         :param style: the CSL style name to format with
+        :param link_titles: whether to wrap each rendered title in a link
+            to the item's `link` value, instead of leaving the citation
+            as plain text for the caller to wrap
         :return: a list of formatted HTML entries, one per item, in order
         """
-        keys = [self._cache_key(item, style) for item in items]
+        keys = [self._cache_key(item, style, link_titles) for item in items]
 
         uncached = [
             item
@@ -121,13 +154,13 @@ class CitationRenderer:
         ]
 
         if uncached:
-            rendered = self._render_batch(uncached, style)
+            rendered = self._render_batch(uncached, style, link_titles)
             for item, entry in zip(uncached, rendered, strict=True):
-                self._cache[self._cache_key(item, style)] = entry
+                self._cache[self._cache_key(item, style, link_titles)] = entry
 
         return [self._cache[key] for key in keys]
 
-    def _render_batch(self, items, style):
+    def _render_batch(self, items, style, link_titles=False):
         """Render a batch of items with the engine for the given style."""
         self.logger.debug(f"Rendering {len(items)} citations with {style}")
 
@@ -137,13 +170,13 @@ class CitationRenderer:
                 engine = CiteprocEngine(self.style_path(style), self.locale_path())
                 self._engines[style] = engine
 
-            return engine.render(items)
+            return engine.render(items, link_titles)
         except Exception as error:
             raise RuntimeError(f"Citation rendering failed: {error}") from error
 
     @staticmethod
-    def _cache_key(item, style):
+    def _cache_key(item, style, link_titles=False):
         # the id field is positional bookkeeping, not content: two identical
         # publications in different sections must share a cache entry
         content = {key: value for key, value in item.items() if key != "id"}
-        return (style, json.dumps(content, sort_keys=True))
+        return (style, link_titles, json.dumps(content, sort_keys=True))

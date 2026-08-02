@@ -30,7 +30,7 @@ class FakeEngine:
         self.entries_by_id = entries_by_id
         self.rendered = []
 
-    def render(self, items):
+    def render(self, items, link_titles=False):
         self.rendered.append([dict(item) for item in items])
         return [self.entries_by_id[item["id"]] for item in items]
 
@@ -239,3 +239,51 @@ class TestRealEngine:
 
         assert "First" in first[0]
         assert "Second" in second[0]
+
+
+class TestTitleLinks:
+    """Integration: linking only the title via the variableWrapper hook."""
+
+    ITEM = {
+        "id": "linked-1",
+        "type": "book",
+        "title": "A Test Title",
+        "author": [{"family": "Doe", "given": "Jane"}],
+        "issued": {"date-parts": [[2024]]},
+        "link": "https://repo.example/1?a=1&b=2",
+    }
+
+    STYLE = "modern-humanities-research-association"
+
+    def test_title_mode_links_only_the_title(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        [entry] = renderer.render([self.ITEM], self.STYLE, link_titles=True)
+
+        assert (
+            '<a href="https://repo.example/1?a=1&amp;b=2">'
+            "<i>A Test Title</i></a>" in entry
+        )
+        # the author stays outside the anchor
+        assert entry.count("<a ") == 1
+        assert "Doe, Jane, <a" in entry
+
+    def test_entry_mode_renders_no_anchor(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        [entry] = renderer.render([self.ITEM], self.STYLE)
+
+        assert "<a " not in entry
+
+    def test_item_without_a_link_gets_no_anchor(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        item = {key: value for key, value in self.ITEM.items() if key != "link"}
+        [entry] = renderer.render([item], self.STYLE, link_titles=True)
+
+        assert "<a " not in entry
+
+    def test_cache_distinguishes_link_modes(self, real_config, logger):
+        renderer = CitationRenderer(real_config, logger)
+        [linked] = renderer.render([self.ITEM], self.STYLE, link_titles=True)
+        [plain] = renderer.render([self.ITEM], self.STYLE)
+
+        assert "<a " in linked
+        assert "<a " not in plain

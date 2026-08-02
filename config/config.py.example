@@ -230,6 +230,12 @@ citeproc_item_templates_new_date = {
 gold_oa_direct_link = {'pdf': True,
                        'html': True}
 
+# which part of each citation is the clickable link: 'title' links just
+# the item's title, 'entry' wraps the whole citation in one link (the
+# default when this setting is absent)
+citation_link = {'pdf': 'title',
+                 'html': 'entry'}
+
 # the email address shown for open access queries
 email = emails[0]
 

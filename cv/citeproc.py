@@ -276,7 +276,9 @@ class CiteProc:
         return oa_status
 
     @staticmethod
-    def _substitute_item_template(template, citeproc, the_date, item, oa_status):
+    def _substitute_item_template(
+        template, citeproc, the_date, item, oa_status, link_mode="entry"
+    ):
         """
         Substitutes variables into an item template. This handles [[year]],
         [[oa_status]] and [[citeproc]].
@@ -285,11 +287,21 @@ class CiteProc:
         :param the_date: the date to use
         :param item: the eprints item
         :param oa_status: the formatted open access status string
+        :param link_mode: 'entry' links the whole citation to the item;
+            'title' leaves the citation alone because the renderer has
+            already linked just its title
         :return: a formatted output line
         """
-        # citeproc returns a div; convert it to a link to the item
-        citeproc = citeproc.replace("<div", '<a href="{}"'.format(item["uri"]))
-        citeproc = citeproc.replace("</div", "</a")
+        if link_mode == "title":
+            # the title already carries the link; keep the rest plain
+            citeproc = citeproc.replace("<div", "<span")
+            citeproc = citeproc.replace("</div", "</span")
+        else:
+            # citeproc returns a div; convert it to a link to the item
+            citeproc = citeproc.replace(
+                "<div", '<a href="{}"'.format(item["uri"])
+            )
+            citeproc = citeproc.replace("</div", "</a")
 
         line = template.replace("[[citeproc]]", citeproc)
         line = line.replace("[[year]]", str(the_date))
@@ -345,7 +357,12 @@ class CiteProc:
             the_date_list.append(the_date)
 
         # format all of the section's citations in one renderer call
-        entries = self.renderer.render(csl_items, self.config.citeproc_style[rule])
+        link_mode = getattr(self.config, "citation_link", {}).get(rule, "entry")
+        entries = self.renderer.render(
+            csl_items,
+            self.config.citeproc_style[rule],
+            link_titles=link_mode == "title",
+        )
 
         output_string = ""
         current_date = ""
@@ -364,6 +381,7 @@ class CiteProc:
                 oa_status,
                 output_string,
                 the_date,
+                link_mode,
             )
 
         return self._finalize_section(
@@ -398,6 +416,11 @@ class CiteProc:
         self._build_pages(identifier, item, items)
         self._build_identifier(identifier, item, items, rule)
         self._build_event(identifier, item, items)
+
+        # the renderer's title-link mode needs the item's target; this is
+        # set after the identifier step so gold OA rewrites are honoured
+        if "uri" in item:
+            items[identifier]["link"] = item["uri"]
 
         return items[identifier]
 
@@ -451,16 +474,22 @@ class CiteProc:
         oa_status,
         output_string,
         the_date,
+        link_mode="entry",
     ):
         if entry:
             if current_date != the_date:
                 line = self._substitute_item_template(
-                    item_templates_new_date, entry, the_date, item, oa_status
+                    item_templates_new_date,
+                    entry,
+                    the_date,
+                    item,
+                    oa_status,
+                    link_mode,
                 )
                 current_date = the_date
             else:
                 line = self._substitute_item_template(
-                    item_templates, entry, the_date, item, oa_status
+                    item_templates, entry, the_date, item, oa_status, link_mode
                 )
 
             output_string += line
