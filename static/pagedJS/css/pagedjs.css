@@ -54,20 +54,6 @@ html{
 
 @page:left {
 
-
-  
-
-  @bottom-right{
-    content: counter(page);
-    /*font-weight: 400;*/
-    font-family: var(--serif);
-    /*font-weight: normal;*/
-    line-height: var(--line-height);
-    vertical-align: bottom;
-    /*margin-bottom: 14px;*/
-    font-variant-numeric: oldstyle-nums;
-  }
-
   @top-center{
     content: string(booktitle);
     /*font-weight: 400;*/
@@ -84,19 +70,6 @@ html{
 }
 
 @page:right {
-  
-  
-  @bottom-right{
-    content: counter(page);
-    /*font-weight: 400;*/
-    font-family: var(--serif);
-    /*font-weight: normal;*/
-    line-height: var(--line-height);
-    vertical-align: bottom;
-    /*margin-bottom: 14px;*/
-    font-variant-numeric: oldstyle-nums;
-    text-align: right;
-  }
 
   @top-center{
     content: element(shorter);
