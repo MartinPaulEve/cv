@@ -113,7 +113,7 @@ output_rules = {'html': ['templates/HTML',
 
                 'pdf': ['templates/PDF',
                         'output/Eve-CV-PDF.html',
-                        'node ./print.js output/Eve-CV-PDF.html output/Eve-CV.pdf',
+                        'uv run cv-print output/Eve-CV-PDF.html output/Eve-CV.pdf',
                         ]}
 
 # define the section template

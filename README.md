@@ -12,18 +12,19 @@ repository's record is preferred and its gaps are filled from later copies.
 Both outputs are designed to support WCAG 2.2 AAA accessibility: semantic
 list and landmark structure, AAA contrast, accessible link names, and a
 tagged PDF with a document outline, produced fully headlessly. The axe-core
-gate (`npm run check-access`) checks the generated HTML documents for
+gate (`uv run cv-check-access`) checks the generated HTML documents for
 automatically detectable issues and verifies that the PDF contains tagging,
 language, and outline structures. Manual review remains necessary for WCAG
 criteria that cannot be automated.
 
 The project uses [uv](https://docs.astral.sh/uv/) for Python packaging and
-running, with npm for citeproc-js, PDF generation, and accessibility checks.
-Install both dependency sets before the first build:
+running. PDF generation and the accessibility checks drive a headless
+Chromium through Playwright, so install the dependencies and the browser
+before the first build:
 
 ```
 uv sync
-npm ci
+uv run playwright install chromium
 ```
 
 # Usage
@@ -86,10 +87,11 @@ The `fetch` mode pulls publication metadata from the remote repository (or the
 on-disk cache in `data/`, unless `--refresh` is given); the `make` mode builds
 the configured outputs from that cached data without touching the network.
 
-Citations are formatted in-process with [citeproc-js](https://github.com/Juris-M/citeproc-js)
-(installed by `npm ci`); the CSL style and locale are vendored in `static/csl`,
-so the build needs no external services and no network access beyond the
-initial metadata fetch. PDF generation is fully headless.
+Citations are formatted in-process with [citeproc-js](https://github.com/Juris-M/citeproc-js),
+vendored in `static/js` and run on an embedded V8 engine (mini-racer); the
+CSL style and locale are vendored in `static/csl`, so the build needs no
+external services and no network access beyond the initial metadata fetch.
+PDF generation is fully headless.
 
 # Development
 
@@ -98,5 +100,4 @@ Run the tests and the linter with:
 ```
 uv run pytest
 uv run ruff check cv tests
-npm test
 ```

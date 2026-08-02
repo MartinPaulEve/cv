@@ -8,12 +8,16 @@ license = { file = "LICENSE" }
 authors = [{ name = "Martin Paul Eve", email = "martin@eve.gd" }]
 dependencies = [
     "docopt-ng>=0.9.0",
+    "mini-racer>=0.14.1",
+    "playwright>=1.62.0",
     "requests>=2.32.0",
     "rich>=13.0.0",
 ]
 
 [project.scripts]
 cv = "cv.cli:run"
+cv-print = "cv.printpdf:run"
+cv-check-access = "cv.access_check:run"
 
 [dependency-groups]
 dev = [
@@ -49,3 +53,6 @@ ignore = ["SIM114"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "browser: tests that launch a real headless Chromium via Playwright",
+]

@@ -145,7 +145,7 @@ output_rules = {'html': ['templates/HTML',
 
                 'pdf': ['templates/PDF',
                         'output/CV-PDF.html',
-                        'node ./print.js output/CV-PDF.html output/CV.pdf',
+                        'uv run cv-print output/CV-PDF.html output/CV.pdf',
                         ]}
 
 # the wrapper placed around each generated section
