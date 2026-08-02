@@ -1,3 +1,13 @@
+## 1.7.0 (2026-08-02)
+
+### Feat
+
+- **config**: derive output filenames when rules omit them
+
+### Refactor
+
+- **config**: modernise the shipped configs and drop stale defaults
+
 ## 1.6.0 (2026-08-02)
 
 ### Feat
