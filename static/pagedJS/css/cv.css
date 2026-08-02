@@ -287,8 +287,13 @@ div.footnote p {
 	text-indent: 0in;
 }
 
-/* the page number: equal gaps from the bottom and right page edges,
-   one third of the distance from the page edge to the text margin */
-.pagedjs_margin-bottom-right > .pagedjs_margin-content {
-  transform: translate(48.5pt, -19.5pt);
+/* the "page/total" folio, written into the top-right margin box by the
+   template once pagination finishes: equal gaps from the top and right
+   page edges, one third of the distance to the text margin */
+.pagedjs_margin-top-right > .pagedjs_margin-content {
+  font-family: var(--serif);
+  line-height: var(--line-height);
+  font-variant-numeric: oldstyle-nums;
+  text-align: right;
+  transform: translate(48.5pt, -7pt);
 }

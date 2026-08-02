@@ -13,9 +13,23 @@
     /* signal to the printing process when Paged.js has finished laying
        out the document, so that the PDF is only captured once rendering
        is genuinely complete (this build of Paged.js calls
-       window.onPagesRendered when the flow is done) */
+       window.onPagesRendered when the flow is done). Before signalling,
+       write the "page/total" folio into each page's top-right margin
+       box: this build of Paged.js predates the counter(pages) total, so
+       the folio is composed here once the page count is known. */
     window.__pagedDone = false;
-    window.onPagesRendered = function () { window.__pagedDone = true; };
+    window.onPagesRendered = function () {
+      var pages = document.querySelectorAll('.pagedjs_page');
+      pages.forEach(function (page, index) {
+        if (page.classList.contains('pagedjs_blank_page')) { return; }
+        var box = page.querySelector('.pagedjs_margin-top-right');
+        if (!box) { return; }
+        box.classList.add('hasContent');
+        box.querySelector('.pagedjs_margin-content').textContent =
+          (index + 1) + '/' + pages.length;
+      });
+      window.__pagedDone = true;
+    };
   </script>
   <script src="../static/pagedJS/js/pagedjs.js"></script>
 </head>
