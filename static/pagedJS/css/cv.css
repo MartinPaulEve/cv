@@ -287,8 +287,8 @@ div.footnote p {
 	text-indent: 0in;
 }
 
-/* the page number: lifted slightly off the bottom edge and pushed toward
-   the right edge so its right gap matches its bottom gap */
+/* the page number: equal gaps from the bottom and right page edges,
+   one third of the distance from the page edge to the text margin */
 .pagedjs_margin-bottom-right > .pagedjs_margin-content {
-  transform: translate(61pt, -7pt);
+  transform: translate(48.5pt, -19.5pt);
 }
