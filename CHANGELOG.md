@@ -1,3 +1,15 @@
+## 1.5.0 (2026-08-02)
+
+### Feat
+
+- **provenance**: write a human-readable provenance log on fetch
+- **search**: per-repository search strategy customisation
+
+### Fix
+
+- **provenance**: escape Unicode line and paragraph separators too
+- **provenance**: escape control characters from remote metadata in the log
+
 ## 1.4.0 (2026-08-02)
 
 ### Feat
