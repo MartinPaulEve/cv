@@ -146,6 +146,11 @@ list_template = {'pdf': '<ul class="publist">{0}</ul>',
 gold_oa_direct_link = {'pdf': True,
                        'html': True}
 
+# which part of each citation is the clickable link: 'title' links just
+# the item's title, 'entry' wraps the whole citation in one link
+citation_link = {'pdf': 'title',
+                 'html': 'entry'}
+
 # the email address for OA status display
 email = emails[0]
 

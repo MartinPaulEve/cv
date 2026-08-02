@@ -227,7 +227,7 @@ class TestSectionRendering:
                 ]
 
         class FakeRenderer:
-            def render(self, items, style):
+            def render(self, items, style, link_titles=False):
                 assert style == "modern-humanities-research-association"
                 assert [i["type"] for i in items] == ["book", "book"]
                 return [
@@ -336,3 +336,55 @@ class TestPeopleMapping:
         items = {"id1": {}}
         processor._build_creators("id1", {}, items)
         assert "author" not in items["id1"]
+
+
+class TestTitleLinkMode:
+    def test_title_mode_keeps_the_entry_as_a_plain_span(self):
+        line = CiteProc._substitute_item_template(
+            template="<p>[[citeproc]]</p>",
+            citeproc='<div class="csl-entry">Doe, <a href="u">T</a>.</div>',
+            the_date=2020,
+            item={"uri": "https://repo.example/1"},
+            oa_status="",
+            link_mode="title",
+        )
+        assert '<span class="csl-entry">' in line
+        assert "</span>" in line
+        assert "<div" not in line
+        # only the title anchor remains: no whole-entry link is added
+        assert line.count("<a ") == 1
+        assert 'href="https://repo.example/1"' not in line
+
+    def test_section_links_titles_when_configured(self, fake_config, logger):
+        fake_config.citation_link = {"html": "title"}
+
+        class FakeRepo:
+            def __getattr__(self, name):
+                return [
+                    {"type": "book", "title": "First", "date": "2020-01-01",
+                     "uri": "https://repo.example/1"},
+                ]
+
+        class FakeRenderer:
+            def render(self, items, style, link_titles=False):
+                if link_titles:
+                    return [
+                        '<div class="csl-entry"><a href="{}">{}</a>.</div>'
+                        .format(item["link"], item["title"])
+                        for item in items
+                    ]
+                return [
+                    f'<div class="csl-entry">{item["title"]}.</div>'
+                    for item in items
+                ]
+
+        processor = CiteProc(
+            repo=FakeRepo(), config=fake_config, logger=logger,
+            renderer=FakeRenderer(),
+        )
+        section = processor._eprint_substitute("books", "html")
+
+        assert '<a href="https://repo.example/1">First</a>' in section
+        assert section.count("<a ") == 1
+        assert '<span class="csl-entry">' in section
+        assert '<div class="csl-entry"' not in section
