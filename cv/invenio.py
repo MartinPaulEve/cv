@@ -70,6 +70,8 @@ class InvenioSource:
         self.api = config.invenio["api"]
         self.type_map = config.invenio.get("type_map", DEFAULT_TYPE_MAP)
         self.name = config.invenio.get("name") or default_source_name(self.api)
+        # an optional provenance recorder, attached by the Repository
+        self.recorder = None
 
     def creator_query(self):
         """The records query for the configured user's name."""
@@ -139,18 +141,31 @@ class InvenioSource:
         strategies, mode = self._search_plan()
 
         records = {}
-        for strategy in strategies:
-            found = list(self._search(self._query_for(strategy)))
+        for position, strategy in enumerate(strategies):
+            query = self._query_for(strategy)
+            found = list(self._search(query))
 
             self.logger.debug(
                 f"{self.name}: strategy '{strategy}' returned "
                 f"{len(found)} records"
             )
 
+            if self.recorder:
+                self.recorder.search_ran(
+                    self.name, strategy, query, len(found), mode
+                )
+
             for record in found:
                 records[record["id"]] = record
 
             if mode == "first" and found:
+                if self.recorder:
+                    for skipped in strategies[position + 1 :]:
+                        self.recorder.search_skipped(
+                            self.name,
+                            skipped,
+                            "an earlier strategy already returned records",
+                        )
                 break
 
         self.logger.debug(f"Fetched {len(records)} InvenioRDM records")
@@ -160,6 +175,17 @@ class InvenioSource:
             item = self.normalise(record)
             if item is not None:
                 items.append(item)
+            elif self.recorder:
+                resource_type = (
+                    record.get("metadata", {})
+                    .get("resource_type", {})
+                    .get("id", "")
+                )
+                self.recorder.record_skipped(
+                    self.name,
+                    record.get("id"),
+                    f"unmapped resource type {resource_type}",
+                )
 
         return items
 

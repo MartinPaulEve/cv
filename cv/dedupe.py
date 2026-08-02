@@ -80,13 +80,19 @@ def _title_key(record):
     return (title, record.get("type"))
 
 
-def merge_records(primary, secondary):
+def merge_records(primary, secondary, recorder=None):
     """
     Merge two record lists, deduplicating duplicates
     :param primary: records from the preferred repository (kept as-is,
         gaps filled from a duplicate where one exists)
     :param secondary: records from the other repository (appended only
         when no earlier record is a duplicate)
+    :param recorder: an optional object told about merge decisions:
+        filled(target, fields) when a secondary copy fills gaps in an
+        earlier record; discarded(record, target, reason) when a
+        secondary copy is dropped as a duplicate, with reason a
+        ('doi', <matched doi>) or ('title', <title>) tuple; and
+        appended(record) when a secondary record joins the list as new
     :return: a single merged record list
     """
     merged = [dict(record) for record in primary]
@@ -106,32 +112,48 @@ def merge_records(primary, secondary):
 
     for record in secondary:
         record_doi_values = record_dois(record)
-        doi_matches = [
-            by_doi[doi] for doi in record_doi_values if doi in by_doi
-        ]
-        title_match = by_title.get(_title_key(record))
 
-        # Title matching exists for records that lack a DOI. Two records
-        # carrying different DOIs are distinct even when their titles match.
-        if (
-            title_match is not None
-            and record_doi_values
-            and record_dois(title_match)
-        ):
-            title_match = None
+        target = None
+        reason = None
+        for doi in record_doi_values:
+            if doi in by_doi:
+                target = by_doi[doi]
+                reason = ("doi", doi)
+                break
 
-        target = doi_matches[0] if doi_matches else title_match
+        if target is None:
+            title_match = by_title.get(_title_key(record))
+
+            # Title matching exists for records that lack a DOI. Two
+            # records carrying different DOIs are distinct even when
+            # their titles match.
+            if (
+                title_match is not None
+                and record_doi_values
+                and record_dois(title_match)
+            ):
+                title_match = None
+
+            if title_match is not None:
+                target = title_match
+                reason = ("title", record.get("title", ""))
 
         if target is not None:
             # take the best of both: the earlier record keeps its own
             # values and gains any fields only this copy has
-            for key, value in record.items():
-                if key not in target:
-                    target[key] = value
+            added = [key for key in record if key not in target]
+            for key in added:
+                target[key] = record[key]
             index(target)
+            if recorder is not None:
+                if added:
+                    recorder.filled(target, added)
+                recorder.discarded(record, target, reason)
         else:
             copy = dict(record)
             merged.append(copy)
             index(copy)
+            if recorder is not None:
+                recorder.appended(copy)
 
     return merged

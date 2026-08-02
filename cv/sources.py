@@ -142,6 +142,8 @@ class EprintsSource:
         self.name = entry.get("name") or default_source_name(entry["repo"])
         self.email_view = entry.get("email_view", self.DEFAULT_EMAIL_VIEW)
         self.url = self._build_url()
+        # an optional provenance recorder, attached by the Repository
+        self.recorder = None
 
     def _base_url(self):
         """The repository base URL with a scheme and a trailing slash."""
@@ -238,16 +240,20 @@ class EprintsSource:
             "(expected 'name', 'user', or 'email')"
         )
 
-    def _run_strategy(self, strategy):
+    def _run_strategy(self, strategy, mode):
         """
         Run one search strategy
         :param strategy: the strategy name
+        :param mode: the combine mode the plan runs under (recorded in
+            the provenance log)
         :return: the records it found, deduplicated by eprintid
         """
         found = []
         seen = set()
+        urls = []
 
         for url, missing_ok in self._strategy_requests(strategy):
+            urls.append(url)
             self.logger.debug(f"Fetching eprints data from {url}")
 
             response = requests.get(url, timeout=60)
@@ -266,7 +272,23 @@ class EprintsSource:
                     seen.add(key)
                 found.append(item)
 
+        if self.recorder:
+            self.recorder.search_ran(
+                self.name, strategy, ", ".join(urls), len(found), mode
+            )
+
         return found
+
+    def _record_skipped_strategies(self, strategies):
+        """Note strategies never run because an earlier one succeeded."""
+        if not self.recorder:
+            return
+        for strategy in strategies:
+            self.recorder.search_skipped(
+                self.name,
+                strategy,
+                "an earlier strategy already returned records",
+            )
 
     def fetch(self):
         """
@@ -279,8 +301,8 @@ class EprintsSource:
         items = []
         seen = set()
 
-        for strategy in strategies:
-            found = self._run_strategy(strategy)
+        for position, strategy in enumerate(strategies):
+            found = self._run_strategy(strategy, mode)
 
             self.logger.debug(
                 f"{self.name}: strategy '{strategy}' returned "
@@ -289,6 +311,7 @@ class EprintsSource:
 
             if mode == "first":
                 if found:
+                    self._record_skipped_strategies(strategies[position + 1 :])
                     return found
                 continue
 

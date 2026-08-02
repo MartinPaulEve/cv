@@ -18,6 +18,7 @@ import requests
 
 from cv.dedupe import merge_records
 from cv.invenio import InvenioSource
+from cv.provenance import ProvenanceRecorder
 from cv.sources import (
     ConfigView,
     EprintsSource,
@@ -99,10 +100,11 @@ class Repository:
 
         return sources
 
-    def _fetch_all_sources(self):
+    def _fetch_all_sources(self, provenance):
         """
         Fetch every configured source and merge the results in priority
-        order
+        order, recording provenance events along the way
+        :param provenance: a ProvenanceRecorder collecting fetch events
         :return: the merged record list, or None on any failure
         """
         sources = self._build_sources()
@@ -117,7 +119,8 @@ class Repository:
         records = None
 
         for source in sources:
-            name = getattr(source, "name", type(source).__name__)
+            name = getattr(source, "name", None) or type(source).__name__
+            source.recorder = provenance
             try:
                 items = source.fetch()
             except (
@@ -130,9 +133,13 @@ class Repository:
 
             self.logger.info(f"Fetched {len(items)} items from {name}")
 
-            records = (
-                items if records is None else merge_records(records, items)
-            )
+            if records is None:
+                records = items
+                provenance.base_records(name, items)
+            else:
+                records = merge_records(
+                    records, items, recorder=provenance.for_source(name)
+                )
 
         return records
 
@@ -147,7 +154,10 @@ class Repository:
         if not os.path.isfile(self.config.storage["json"]) or refresh:
             self.logger.debug("Attempting to refresh from configured sources")
 
-            records = self._fetch_all_sources()
+            provenance = ProvenanceRecorder(
+                profile=getattr(self.config, "profile", None)
+            )
+            records = self._fetch_all_sources(provenance)
 
             if records is None:
                 self._json_loaded = False
@@ -165,6 +175,7 @@ class Repository:
                     json.dump(records, json_out_file)
                     temp_path = json_out_file.name
                 os.replace(temp_path, destination)
+                self._write_provenance(provenance)
                 self.json = records
                 self._json_loaded = True
                 return True
@@ -192,6 +203,25 @@ class Repository:
                 )
                 self._json_loaded = False
                 return False
+
+    def _write_provenance(self, provenance):
+        """
+        Write the provenance log next to the cached data
+        :param provenance: the ProvenanceRecorder holding this fetch's
+            events
+        """
+        destination = self.config.storage["json"]
+        path = os.path.join(
+            os.path.dirname(destination) or ".", "provenance.log"
+        )
+
+        try:
+            provenance.write(path)
+        except OSError as exc:
+            self.logger.error(f"Cannot write provenance log to {path}: {exc}")
+            return
+
+        self.logger.info(f"Provenance log written to {path}")
 
     def _parse_json(self, types, load_json=False, check_types=False):
         """
