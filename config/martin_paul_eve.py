@@ -7,12 +7,16 @@ emails = ["martin.eve@bbk.ac.uk", "eve@msu.edu", "martin@eve.gd"]
 orcid = "0000-0002-5589-8511"
 
 # this specifies the base eprints URL; the person identifier is derived
-# automatically from the plaintext user variable above
+# automatically from the plaintext user variable above. Both `eprints`
+# and `invenio` also accept a list of entries for fetching from several
+# repositories of the same type, merged in declaration order (eprints
+# entries first); each entry takes an optional human-readable 'name',
+# defaulting to the hostname
 eprints = {'repo': 'eprints.bbk.ac.uk'}
 
 # an InvenioRDM repository (KC Works) whose records are merged with the
-# eprints data on fetch; items sharing a DOI with an eprints deposit are
-# deduplicated, with the eprints record preferred and its gaps filled
+# eprints data on fetch; items sharing a DOI with an earlier deposit are
+# deduplicated, with the earlier record preferred and its gaps filled
 # from the InvenioRDM copy
 invenio = {'api': 'https://works.hcommons.org/api/records'}
 

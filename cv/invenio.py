@@ -16,6 +16,8 @@ from urllib.parse import quote, urljoin
 
 import requests
 
+from cv.sources import default_source_name
+
 # how InvenioRDM resource types map onto the internal eprints-style types;
 # types absent from this mapping (blog posts, video, and so on) have no CV
 # section and are skipped
@@ -60,6 +62,7 @@ class InvenioSource:
         self.logger = logger
         self.api = config.invenio["api"]
         self.type_map = config.invenio.get("type_map", DEFAULT_TYPE_MAP)
+        self.name = config.invenio.get("name") or default_source_name(self.api)
 
     def creator_query(self):
         """The records query for the configured user's name."""

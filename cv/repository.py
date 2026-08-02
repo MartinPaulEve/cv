@@ -1,10 +1,13 @@
-"""Fetch and classify publication metadata from an eprints repository.
+"""Fetch and classify publication metadata from configured repositories.
 
-The Repository class downloads a scholar's publication list from an
-eprints "exportview" JSON endpoint, caches it on disk, and splits it into
-per-section files (books, articles, and so on) according to the rules in
-the configuration: peer-review status, editorial status, and whether an
-item is a book review.
+The Repository class downloads a scholar's publication lists from every
+configured repository source (any number of eprints and InvenioRDM
+instances), merges them in declaration order — the first source is
+primary; each later source fills gaps in earlier records or appends new
+ones, deduplicated by DOI with a title fallback — caches the merged list
+on disk, and splits it into per-section files (books, articles, and so
+on) according to the rules in the configuration: peer-review status,
+editorial status, and whether an item is a book review.
 """
 
 import json
@@ -13,9 +16,14 @@ import tempfile
 
 import requests
 
-from cv.configuration import encode_eprints_user
 from cv.dedupe import merge_records
 from cv.invenio import InvenioSource
+from cv.sources import (
+    ConfigView,
+    EprintsSource,
+    SourceConfigurationError,
+    normalise_source_entries,
+)
 
 
 class Repository:
@@ -50,65 +58,100 @@ class Repository:
 
     def _build_repo_url(self):
         """
-        Creates the eprints endpoint URL
-        :return: an eprints endpoint URL string
+        Creates the endpoint URL for the first configured eprints
+        repository, kept as `self.url` for backwards compatibility
+        :return: an eprints endpoint URL string, or None when no eprints
+            repository is configured
         """
-        repo = self.config.eprints["repo"]
+        entries = normalise_source_entries(getattr(self.config, "eprints", None))
 
-        if not repo.startswith("htt"):
-            repo = "https://" + repo
+        if not entries:
+            return None
 
-        if not repo.endswith("/"):
-            repo += "/"
-
-        # a pre-encoded eprints user in the config wins; otherwise the
-        # identifier is derived from the plaintext user name
-        if "user" in self.config.eprints:
-            user = self.config.eprints["user"]
-        else:
-            user = encode_eprints_user(self.config.user)
-        url = f"{repo}cgi/exportview/people/{user}/JSON/{user}.js"
+        url = EprintsSource(self.config, self.logger, entries[0]).url
 
         self.logger.debug(f"Built repository URL as: {url}")
 
         return url
 
+    def _build_sources(self):
+        """
+        Build the ordered list of configured repository sources. Priority
+        order is declaration order: every eprints entry first, then every
+        InvenioRDM entry, which preserves the historic precedence of
+        eprints records over InvenioRDM ones.
+        :return: a list of source objects, each with a name and a fetch()
+        """
+        sources = [
+            EprintsSource(self.config, self.logger, entry)
+            for entry in normalise_source_entries(
+                getattr(self.config, "eprints", None)
+            )
+        ]
+
+        for entry in normalise_source_entries(
+            getattr(self.config, "invenio", None)
+        ):
+            # each source sees a config whose `invenio` is its own entry
+            sources.append(
+                InvenioSource(ConfigView(self.config, invenio=entry), self.logger)
+            )
+
+        return sources
+
+    def _fetch_all_sources(self):
+        """
+        Fetch every configured source and merge the results in priority
+        order
+        :return: the merged record list, or None on any failure
+        """
+        sources = self._build_sources()
+
+        if not sources:
+            self.logger.error(
+                "No repository sources are configured: give at least one "
+                "`eprints` or `invenio` entry in the configuration"
+            )
+            return None
+
+        records = None
+
+        for source in sources:
+            name = getattr(source, "name", type(source).__name__)
+            try:
+                items = source.fetch()
+            except (
+                requests.RequestException,
+                json.JSONDecodeError,
+                SourceConfigurationError,
+            ) as exc:
+                self.logger.error(f"Error fetching from {name}: {exc}")
+                return None
+
+            self.logger.info(f"Fetched {len(items)} items from {name}")
+
+            records = (
+                items if records is None else merge_records(records, items)
+            )
+
+        return records
+
     def _populate_json(self, refresh):
         """
         Updates the internal json object either from the on-disk file or from
-        the remote repo
-        :param refresh: whether to refresh from the remote repository even if
-            there is an on-disk representation
+        the configured remote repositories
+        :param refresh: whether to refresh from the remote repositories even
+            if there is an on-disk representation
         :return: boolean indicating whether the operation succeeded
         """
         if not os.path.isfile(self.config.storage["json"]) or refresh:
-            self.logger.debug(f"Attempting to refresh {self.url}")
+            self.logger.debug("Attempting to refresh from configured sources")
 
-            try:
-                response = requests.get(self.url, timeout=60)
-                response.raise_for_status()
-                records = json.loads(response.text)
-            except (requests.RequestException, json.JSONDecodeError) as exc:
-                self.logger.error(f"Error fetching eprints data: {exc}")
+            records = self._fetch_all_sources()
+
+            if records is None:
                 self._json_loaded = False
                 return False
-
-            # merge in any configured InvenioRDM repository (e.g. KC Works),
-            # deduplicating by DOI with the eprints record preferred
-            if getattr(self.config, "invenio", None):
-                try:
-                    invenio_items = InvenioSource(
-                        self.config, self.logger
-                    ).fetch()
-                except requests.RequestException as exc:
-                    self.logger.error(f"Error fetching InvenioRDM data: {exc}")
-                    self._json_loaded = False
-                    return False
-                self.logger.info(
-                    f"Merging {len(invenio_items)} InvenioRDM items "
-                    f"with {len(records)} eprints items"
-                )
-                records = merge_records(records, invenio_items)
 
             temp_path = None
             try:

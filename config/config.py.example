@@ -30,14 +30,27 @@ orcid = "0000-0000-0000-0000"
 # Metadata sources
 # ---------------------------------------------------------------------------
 
-# the base URL of your eprints repository
+# the base URL of your eprints repository. Both `eprints` and `invenio`
+# accept either a single entry or a list of entries, so any number of
+# repositories of each type can be fetched and merged. Priority is
+# declaration order — the first repository is primary and later ones fill
+# gaps in its records or append new ones — with every eprints entry
+# ranked before every invenio entry. Each entry may carry an optional
+# human-readable 'name' (used in logs), defaulting to the hostname, e.g.:
+#
+#   eprints = [{'repo': 'eprints.example.ac.uk', 'name': 'Example eprints'},
+#              {'repo': 'eprints.other.ac.uk'}]
+#
+# Either variable may be deleted; at least one repository of some type
+# must remain.
 eprints = {'repo': 'eprints.example.ac.uk'}
 
-# optionally, an InvenioRDM repository (KC Works, Zenodo, ...) whose
-# records are merged with the eprints data on fetch; items sharing a DOI
-# with an eprints deposit are deduplicated, with the eprints record
-# preferred and its gaps filled from the InvenioRDM copy. Delete this
-# variable to fetch from eprints alone.
+# optionally, one or more InvenioRDM repositories (KC Works, Zenodo, ...)
+# whose records are merged with the eprints data on fetch; items sharing
+# a DOI (or, lacking one, a title) with an earlier deposit are
+# deduplicated, with the earlier record preferred and its gaps filled
+# from the InvenioRDM copy. Delete this variable to fetch from eprints
+# alone.
 invenio = {'api': 'https://works.hcommons.org/api/records'}
 
 # ---------------------------------------------------------------------------

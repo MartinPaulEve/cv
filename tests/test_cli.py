@@ -79,6 +79,21 @@ def test_failed_build_returns_nonzero_status(doubles):
     assert cli.main(["make", "jane_doe", "html"]) == 1
 
 
+def test_list_shaped_eprints_config_is_dispatchable(doubles, fake_config):
+    """A config giving `eprints` as a list of repositories must still load
+    and dispatch; the display name falls back to a pre-encoded user from
+    any entry when no plaintext user is configured."""
+    repo, _, _ = doubles
+    repo.fetch.return_value = True
+    del fake_config.user
+    fake_config.eprints = [
+        {"repo": "a.example.org"},
+        {"repo": "b.example.org", "user": "Listed=3APerson=3A=3A"},
+    ]
+
+    assert cli.main(["fetch", "multi"]) == 0
+
+
 def test_legacy_config_uses_pre_encoded_user_as_display_name(doubles, fake_config):
     repo, _, _ = doubles
     repo.fetch.return_value = True
