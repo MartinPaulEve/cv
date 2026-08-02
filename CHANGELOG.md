@@ -1,3 +1,11 @@
+## 1.4.0 (2026-08-02)
+
+### Feat
+
+- **access**: port the axe-core WCAG gate to Python
+- **print**: produce the tagged PDF with Playwright for Python
+- **renderer**: run citeproc-js in-process on an embedded V8 engine
+
 ## 1.3.0 (2026-08-02)
 
 ### Feat
