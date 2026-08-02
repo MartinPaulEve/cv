@@ -164,12 +164,12 @@ class TestPrintPdf:
 
 
 class TestRun:
-    def test_defaults_preserve_the_historical_file_names(self):
+    def test_missing_arguments_are_a_usage_error(self):
         with patch.object(printpdf, "print_pdf") as print_pdf:
-            printpdf.run([])
+            assert printpdf.run([]) == 2
+            assert printpdf.run(["output/only-one.html"]) == 2
 
-        args = print_pdf.call_args.args
-        assert args == ("output/Eve-CV-PDF.html", "output/Eve-CV.pdf")
+        print_pdf.assert_not_called()
 
     def test_positional_arguments_select_the_documents(self):
         with patch.object(printpdf, "print_pdf") as print_pdf:

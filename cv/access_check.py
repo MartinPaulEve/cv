@@ -50,13 +50,13 @@ _RUN_AXE = (
 def _artifact_paths():
     """Resolve the three artifact paths, honouring the env overrides."""
     fragment = os.environ.get("CV_ACCESSIBILITY_FRAGMENT") or os.path.join(
-        PROJECT_ROOT, "output", "martin_paul_eve-Eve-CV.html"
+        PROJECT_ROOT, "output", "martin_paul_eve.html"
     )
     pdf_source = os.environ.get("CV_ACCESSIBILITY_PDF_SOURCE") or os.path.join(
-        PROJECT_ROOT, "output", "martin_paul_eve-Eve-CV-PDF.html"
+        PROJECT_ROOT, "output", "martin_paul_eve-PDF.html"
     )
     pdf = os.environ.get("CV_ACCESSIBILITY_PDF") or os.path.join(
-        PROJECT_ROOT, "output", "martin_paul_eve-Eve-CV.pdf"
+        PROJECT_ROOT, "output", "martin_paul_eve.pdf"
     )
 
     return os.path.abspath(fragment), os.path.abspath(pdf_source), os.path.abspath(pdf)

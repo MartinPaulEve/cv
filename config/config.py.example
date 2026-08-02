@@ -161,14 +161,20 @@ default_types = ['unedited_books', 'edited_books', 'peer_reviewed_articles']
 # Outputs and layout
 # ---------------------------------------------------------------------------
 
-# output documents: each rule is [template, destination, commands...]
-# where the optional trailing shell commands post-process the output
-output_rules = {'html': ['templates/HTML',
-                         'output/CV.html'],
+# output documents: each rule is a template, optionally followed by
+# shell commands that post-process the output.
+# Filenames are derived for you: your profile name (or the --output
+# name, when given) becomes the file stem and the rule name the
+# extension, so these rules yield <profile>.html and <profile>.pdf in
+# the output directory. Post-processing commands refer to the rule's
+# rendered template as [[source]] and to its final artifact as
+# [[output]]. A rule may still name its files explicitly in the older
+# form: a template, an output path, then any commands with literal
+# paths.
+output_rules = {'html': ['templates/HTML'],
 
                 'pdf': ['templates/PDF',
-                        'output/CV-PDF.html',
-                        'uv run cv-print output/CV-PDF.html output/CV.pdf',
+                        'uv run cv-print [[source]] [[output]]',
                         ]}
 
 # the wrapper placed around each generated section

@@ -6,19 +6,23 @@ emails = ["martin.eve@bbk.ac.uk", "eve@msu.edu", "martin@eve.gd"]
 # ORCID identifier, for repository sources that can search by identifier
 orcid = "0000-0002-5589-8511"
 
-# this specifies the base eprints URL; the person identifier is derived
-# automatically from the plaintext user variable above. Both `eprints`
-# and `invenio` also accept a list of entries for fetching from several
-# repositories of the same type, merged in declaration order (eprints
-# entries first); each entry takes an optional human-readable 'name',
-# defaulting to the hostname
-eprints = {'repo': 'eprints.bbk.ac.uk'}
+# the repositories to fetch from. Both `eprints` and `invenio` take a
+# list of entries, merged in declaration order (eprints entries first):
+# the first source is primary, and later sources fill gaps in earlier
+# records or append new ones, deduplicated by DOI with a title fallback.
+# Each entry's 'name' labels it in logs and the provenance trail, and
+# 'search' pins down how the scholar's records are located there: an
+# ordered strategy list with a combine mode ('union' runs every strategy
+# and merges the results; 'first' stops at the first strategy returning
+# any records). The person identifier for the eprints 'name' strategy is
+# derived automatically from the plaintext user variable above.
+eprints = [{'repo': 'eprints.bbk.ac.uk',
+            'name': 'Birkbeck eprints',
+            'search': {'strategies': ['name'], 'mode': 'first'}}]
 
-# an InvenioRDM repository (KC Works) whose records are merged with the
-# eprints data on fetch; items sharing a DOI with an earlier deposit are
-# deduplicated, with the earlier record preferred and its gaps filled
-# from the InvenioRDM copy
-invenio = {'api': 'https://works.hcommons.org/api/records'}
+invenio = [{'api': 'https://works.hcommons.org/api/records',
+            'name': 'KC Works',
+            'search': {'strategies': ['name', 'orcid'], 'mode': 'union'}}]
 
 # this controls the output headings in the template
 section_headings = {'pdf': {'all_books': "BOOKS",
@@ -106,14 +110,16 @@ storage = {'json': 'data/eprints.json',
 default_types = ['unedited_books', 'edited_books', 'peer_reviewed_articles']
 
 # this controls output documents
-# a dictionary of lists, the first entry in each list should be a template, the second a file destination, then a series
-# of operations required to create the output (the latter optional)
-output_rules = {'html': ['templates/HTML',
-                         'output/Eve-CV.html'],
+# each rule is a template, optionally followed by post-processing
+# commands. Filenames are derived: the profile (or the --output name,
+# when given) becomes the file stem, and the rule name the extension, so
+# these rules yield martin_paul_eve.html and martin_paul_eve.pdf in the
+# output directory. Commands refer to the rule's rendered template as
+# [[source]] and to its final artifact as [[output]]
+output_rules = {'html': ['templates/HTML'],
 
                 'pdf': ['templates/PDF',
-                        'output/Eve-CV-PDF.html',
-                        'uv run cv-print output/Eve-CV-PDF.html output/Eve-CV.pdf',
+                        'uv run cv-print [[source]] [[output]]',
                         ]}
 
 # define the section template

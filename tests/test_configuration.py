@@ -147,3 +147,41 @@ class TestOutputName:
     def test_without_an_output_name_profile_naming_is_unchanged(self, config_file):
         config = load_config(config_file)
         assert config.output_rules["html"][1].endswith("output/jane_doe-CV.html")
+
+
+class TestFilenameLessOutputRules:
+    @pytest.fixture
+    def config_file(self, config_dir):
+        (config_dir / "jane_doe.py").write_text(
+            'user = "Jane Doe"\n'
+            "output_rules = {"
+            '"html": ["templates/HTML"],'
+            '"pdf": ["templates/PDF", "uv run cv-print [[source]] [[output]]"]}\n'
+        )
+        return str(config_dir / "jane_doe.py")
+
+    def test_rule_without_commands_derives_its_output_from_the_profile(
+        self, config_file
+    ):
+        config = load_config(config_file)
+        assert config.output_rules["html"][1].endswith("output/jane_doe.html")
+
+    def test_rule_with_commands_writes_a_source_and_names_the_artifact(
+        self, config_file
+    ):
+        config = load_config(config_file)
+        assert config.output_rules["pdf"][1].endswith("output/jane_doe-PDF.html")
+        command = config.output_rules["pdf"][2]
+        assert "output/jane_doe-PDF.html" in command
+        assert command.endswith("output/jane_doe.pdf")
+        assert "[[" not in command
+
+    def test_output_name_overrides_the_derived_stem(self, config_file):
+        config = load_config(config_file, output_name="123")
+        assert config.output_rules["html"][1].endswith("output/123.html")
+        assert config.output_rules["pdf"][1].endswith("output/123-PDF.html")
+        assert config.output_rules["pdf"][2].endswith("output/123.pdf")
+
+    def test_templates_resolve_as_before(self, config_file):
+        config = load_config(config_file)
+        assert Path(config.output_rules["html"][0]) == PROJECT_ROOT / "templates/HTML"
