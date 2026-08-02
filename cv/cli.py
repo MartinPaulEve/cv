@@ -2,7 +2,7 @@
 
 Usage:
   cv fetch CONFIG [TYPES ...] [--debug] [--refresh]
-  cv make CONFIG OUTPUT_TYPES... [--debug]
+  cv make CONFIG OUTPUT_TYPES... [--debug] [--output=NAME]
   cv (-h | --help)
   cv --version
 
@@ -11,6 +11,8 @@ Options:
   --version     Show version.
   --debug       Enable debug output.
   --refresh     Delete cached versions and do a hard refresh from the repository.
+  --output=NAME  Base name for the generated files: --output 123 writes
+                 123.html and 123.pdf into the output directory.
 
 Info:
 
@@ -91,7 +93,9 @@ def main(argv=None):
     logger = _configure_logging(args["--debug"])
     logger.info(app)
 
-    config = load_config(resolve_config_path(args["CONFIG"]))
+    config = load_config(
+        resolve_config_path(args["CONFIG"]), output_name=args["--output"]
+    )
     logger.info(f"Building for {_display_name(config)}")
 
     repo = Repository(config, logger, args["--refresh"])
