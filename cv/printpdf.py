@@ -9,9 +9,8 @@ document outline, so that the result carries the heading/list/link
 structure that assistive technology needs, rather than being a flat
 picture of text.
 
-Usage: cv-print [input.html] [output.pdf]
-Paths are relative to the project root; defaults preserve the historical
-file names.
+Usage: cv-print <input.html> <output.pdf>
+Paths are relative to the project root.
 """
 
 import os
@@ -23,9 +22,6 @@ from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from playwright.sync_api import sync_playwright
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-DEFAULT_INPUT = "output/Eve-CV-PDF.html"
-DEFAULT_OUTPUT = "output/Eve-CV.pdf"
 
 # the sandbox flags are needed on Linux distributions that restrict
 # unprivileged user namespaces; the browser only ever loads our own
@@ -119,10 +115,11 @@ def print_pdf(input_html, output_pdf, project_root=PROJECT_ROOT):
 
 
 def run(argv=None):
-    """Console entry point: cv-print [input.html] [output.pdf]"""
+    """Console entry point: cv-print <input.html> <output.pdf>"""
     argv = sys.argv[1:] if argv is None else argv
 
-    input_html = argv[0] if len(argv) > 0 else DEFAULT_INPUT
-    output_pdf = argv[1] if len(argv) > 1 else DEFAULT_OUTPUT
+    if len(argv) < 2:
+        print("usage: cv-print <input.html> <output.pdf>", file=sys.stderr)
+        return 2
 
-    print_pdf(input_html, output_pdf)
+    print_pdf(argv[0], argv[1])
