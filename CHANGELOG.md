@@ -1,3 +1,10 @@
+## 1.9.1 (2026-08-25)
+
+### Fix
+
+- **repository**: order section items by year, newest first
+- **dedupe**: stop deposit-minted DOIs defeating title deduplication
+
 ## 1.9.0 (2026-08-02)
 
 ### Feat
