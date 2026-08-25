@@ -7,7 +7,12 @@ based on the primary record but completed with fields only the secondary
 copy has.
 """
 
-from cv.dedupe import merge_records, normalise_doi, record_dois
+from cv.dedupe import (
+    merge_records,
+    normalise_doi,
+    publication_dois,
+    record_dois,
+)
 
 
 class TestDoiNormalisation:
@@ -51,6 +56,31 @@ class TestRecordDois:
 
     def test_blank_doi_values_are_ignored(self):
         assert record_dois({"doi": "  ", "alternate_dois": [""]}) == set()
+
+
+class TestPublicationDois:
+    def test_minted_deposit_doi_is_excluded(self):
+        """A DOI the repository minted for its own deposit identifies the
+        deposit, not the publication, so it carries no weight when asking
+        which work a record describes."""
+        record = {
+            "doi": "10.17613/M6DW4B",
+            "alternate_dois": ["10.17613/M6DW4B"],
+            "minted_doi": "10.17613/M6DW4B",
+        }
+        assert publication_dois(record) == set()
+
+    def test_publisher_doi_survives_alongside_a_minted_one(self):
+        record = {
+            "doi": "10.53288/0339.1.00",
+            "alternate_dois": ["10.17613/11px-b370", "10.53288/0339.1.00"],
+            "minted_doi": "10.17613/11px-b370",
+        }
+        assert publication_dois(record) == {"10.53288/0339.1.00"}
+
+    def test_without_a_minted_doi_every_doi_counts(self):
+        record = {"doi": "10.1234/abc"}
+        assert publication_dois(record) == {"10.1234/abc"}
 
 
 class TestMerging:
@@ -177,6 +207,112 @@ class TestMerging:
         ]
 
         assert len(merge_records(primary, secondary)) == 2
+
+    def test_deposit_only_doi_does_not_block_a_title_match(self):
+        """The Literature Against Criticism case: the eprints record's DOI
+        lives in its official_url, while the KC Works deposit carries only
+        the DOI the repository minted for its own copy. That deposit DOI
+        says nothing about which work the record describes, so the title
+        match must still collapse the pair."""
+        primary = [
+            {
+                "title": "Literature Against Criticism: University English "
+                "& Contemporary Fiction in Conflict",
+                "type": "book",
+                "official_url": "http://dx.doi.org/10.11647/OBP.0102",
+                "place_of_pub": "Cambridge",
+            }
+        ]
+        secondary = [
+            {
+                "title": "Literature Against Criticism: University English "
+                "and Contemporary Fiction in Conflict",
+                "type": "book",
+                "doi": "10.17613/M6DW4B",
+                "alternate_dois": ["10.17613/M6DW4B"],
+                "minted_doi": "10.17613/M6DW4B",
+            }
+        ]
+
+        merged = merge_records(primary, secondary)
+
+        assert len(merged) == 1
+        assert merged[0]["place_of_pub"] == "Cambridge"
+
+    def test_two_publication_dois_still_defeat_a_title_match(self):
+        """A deposit that records a publisher DOI different from the
+        target's really is another publication, minted DOI or not."""
+        primary = [
+            {
+                "title": "Editorial",
+                "type": "article",
+                "official_url": "https://doi.org/10.1/first",
+            }
+        ]
+        secondary = [
+            {
+                "title": "Editorial",
+                "type": "article",
+                "doi": "10.1/second",
+                "alternate_dois": ["10.17613/dep1", "10.1/second"],
+                "minted_doi": "10.17613/dep1",
+            }
+        ]
+
+        assert len(merge_records(primary, secondary)) == 2
+
+    def test_deposit_doi_does_not_displace_the_targets_own_doi(self):
+        """A title-matched copy must not hand its doi field to a target
+        that already carries a publication DOI (say, in its official_url):
+        the publisher's DOI, not the deposit's, stays the displayed one.
+        The deposit's DOIs still join the record for later matching."""
+        primary = [
+            {
+                "title": "A Book",
+                "type": "book",
+                "official_url": "https://doi.org/10.11647/OBP.0102",
+            }
+        ]
+        secondary = [
+            {
+                "title": "A Book",
+                "type": "book",
+                "doi": "10.17613/M6DW4B",
+                "alternate_dois": ["10.17613/M6DW4B"],
+                "minted_doi": "10.17613/M6DW4B",
+            }
+        ]
+
+        merged = merge_records(primary, secondary)
+
+        assert len(merged) == 1
+        assert "doi" not in merged[0]
+        assert "10.17613/m6dw4b" in record_dois(merged[0])
+
+    def test_doi_still_fills_a_target_without_any_doi(self):
+        """The Password case: the eprints record has no DOI in any field,
+        so the deposit's DOI is better than none and fills the gap."""
+        primary = [
+            {
+                "title": "Password",
+                "type": "book",
+                "official_url": "https://publisher.example/password/",
+            }
+        ]
+        secondary = [
+            {
+                "title": "Password",
+                "type": "book",
+                "doi": "10.17613/gczc8-8gg64",
+                "alternate_dois": ["10.17613/gczc8-8gg64"],
+                "minted_doi": "10.17613/gczc8-8gg64",
+            }
+        ]
+
+        merged = merge_records(primary, secondary)
+
+        assert len(merged) == 1
+        assert merged[0]["doi"] == "10.17613/gczc8-8gg64"
 
     def test_newly_merged_alternate_doi_is_used_for_later_matches(self):
         primary = [{"title": "Primary", "type": "book", "doi": "10.1/a"}]

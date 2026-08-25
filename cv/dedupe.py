@@ -9,6 +9,9 @@ Two records count as duplicates when they share a DOI (however written:
 resolver URLs and case differences are normalised, and a DOI hiding in an
 eprints official_url counts too), or — because some deposits carry no DOI
 at all — when their titles and types are identical after normalisation.
+A DOI a repository minted for its own deposit (KC Works does this) only
+identifies the deposit, not the publication, so it neither stops a title
+match nor displaces a publication DOI the other copy already carries.
 """
 
 import re
@@ -65,6 +68,23 @@ def record_dois(record):
         dois.add(normalise_doi(official_url))
 
     return {doi for doi in dois if doi}
+
+
+def publication_dois(record):
+    """
+    Return the record's publication-identifying DOIs: every DOI it
+    carries except any the holding repository minted for its own deposit
+    (recorded as minted_doi), which identifies the deposit rather than
+    the work
+    :param record: an internal-format publication record
+    :return: a set of normalised DOI strings
+    """
+    dois = record_dois(record)
+
+    if record.get("minted_doi"):
+        dois.discard(normalise_doi(record["minted_doi"]))
+
+    return dois
 
 
 def _title_key(record):
@@ -125,12 +145,14 @@ def merge_records(primary, secondary, recorder=None):
             title_match = by_title.get(_title_key(record))
 
             # Title matching exists for records that lack a DOI. Two
-            # records carrying different DOIs are distinct even when
-            # their titles match.
+            # records carrying different publication DOIs are distinct
+            # even when their titles match — but a deposit-minted DOI
+            # identifies only the deposit, so it cannot make two
+            # same-titled records different works.
             if (
                 title_match is not None
-                and record_doi_values
-                and record_dois(title_match)
+                and publication_dois(record)
+                and publication_dois(title_match)
             ):
                 title_match = None
 
@@ -140,8 +162,12 @@ def merge_records(primary, secondary, recorder=None):
 
         if target is not None:
             # take the best of both: the earlier record keeps its own
-            # values and gains any fields only this copy has
+            # values and gains any fields only this copy has — except
+            # that a copy's doi never displaces a DOI the target already
+            # carries (in its official_url, say)
             added = [key for key in record if key not in target]
+            if "doi" in added and record_dois(target):
+                added.remove("doi")
             for key in added:
                 target[key] = record[key]
             index(target)

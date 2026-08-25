@@ -208,6 +208,22 @@ class TestNormalisation:
     def test_unmapped_resource_type_is_skipped(self, source):
         assert source.normalise(BLOG_RECORD) is None
 
+    def test_repository_minted_doi_is_marked_as_such(self, source):
+        """The DOI the repository minted (pids.doi) identifies the deposit
+        rather than the publication; the item must say which of its DOIs
+        that is so that deduplication can weigh them differently."""
+        item = source.normalise(BOOK_RECORD)
+        assert item["minted_doi"] == "10.17613/11px-b370"
+
+    def test_deposit_whose_only_doi_is_minted_still_marks_it(self, source):
+        item = source.normalise(ARTICLE_RECORD)
+        assert item["doi"] == "10.17613/xyz"
+        assert item["minted_doi"] == "10.17613/xyz"
+
+    def test_no_minted_doi_mark_without_a_minted_doi(self, source):
+        item = source.normalise(CHAPTER_RECORD)
+        assert "minted_doi" not in item
+
     def test_zenodo_inveniordm_record_uses_portable_types_and_file_links(
         self, source
     ):

@@ -269,7 +269,9 @@ class InvenioSource:
         Attach DOIs. The repository-minted DOI (pids.doi) identifies the
         deposit, but a publisher DOI recorded as an alternate identifier
         identifies the publication itself, so the latter is preferred as
-        the item's main DOI; all DOIs are kept for deduplication.
+        the item's main DOI; all DOIs are kept for deduplication, with
+        the minted one marked as such so that deduplication knows it says
+        nothing about which work the record describes.
         """
         minted = record.get("pids", {}).get("doi", {}).get("identifier")
         alternates = [
@@ -285,6 +287,8 @@ class InvenioSource:
 
         item["doi"] = alternates[0] if alternates else minted
         item["alternate_dois"] = all_dois
+        if minted:
+            item["minted_doi"] = minted
 
     def _add_container(self, item, record):
         """Attach journal or book-container metadata from custom fields."""
