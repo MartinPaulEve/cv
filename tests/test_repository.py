@@ -460,6 +460,64 @@ class TestFetchPipeline:
         assert os.path.isfile(fake_config.storage["books"])
         assert not os.path.exists(fake_config.storage["articles"])
 
+    def test_sections_are_ordered_newest_first(self, repo, fake_config):
+        """Records merged in from a secondary repository arrive appended
+        after the date-ordered eprints list; written sections must place
+        every item under its year, newest first, so nothing renders out
+        of chronology."""
+        def book(title, date):
+            return {"type": "book", "title": title, "refereed": "TRUE", "date": date}
+
+        items = [
+            book("New", "2019-01-01"),
+            book("Middle", "2016-10-24"),
+            book("Old", "2014-06-01"),
+            # a year-only record appended by the merge
+            book("Appended", "2016"),
+        ]
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = json.dumps(items)
+            assert repo.fetch(["books"]) is True
+
+        with open(fake_config.storage["books"]) as stored_file:
+            titles = [json.loads(line)["title"] for line in stored_file]
+
+        assert titles == ["New", "Middle", "Appended", "Old"]
+
+    def test_year_ordering_preserves_within_year_order(self, repo, fake_config):
+        """Ordering is by year alone: the repository's own within-year
+        sequence survives, even when a later item carries an earlier
+        month."""
+        items = [
+            {"type": "book", "title": "First", "refereed": "TRUE", "date": "2020-01"},
+            {"type": "book", "title": "Second", "refereed": "TRUE", "date": "2020-12"},
+        ]
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = json.dumps(items)
+            assert repo.fetch(["books"]) is True
+
+        with open(fake_config.storage["books"]) as stored_file:
+            titles = [json.loads(line)["title"] for line in stored_file]
+
+        assert titles == ["First", "Second"]
+
+    def test_undated_items_sort_after_dated_ones(self, repo, fake_config):
+        items = [
+            {"type": "book", "title": "Undated", "refereed": "TRUE"},
+            {"type": "book", "title": "Dated", "refereed": "TRUE", "date": "1999"},
+        ]
+
+        with patch("cv.repository.requests.get") as mock_get:
+            mock_get.return_value.text = json.dumps(items)
+            assert repo.fetch(["books"]) is True
+
+        with open(fake_config.storage["books"]) as stored_file:
+            titles = [json.loads(line)["title"] for line in stored_file]
+
+        assert titles == ["Dated", "Undated"]
+
     def test_empty_refresh_clears_a_requested_section(self, repo, fake_config):
         with open(fake_config.storage["books"], "w") as stored:
             stored.write(json.dumps({"title": "Stale book"}) + "\n")

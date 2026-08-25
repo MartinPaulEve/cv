@@ -298,7 +298,26 @@ class Repository:
                     f"for item {item['title']}"
                 )
 
+        # records merged in from secondary repositories arrive appended
+        # after the date-ordered primary list; ordering by year (newest
+        # first, stably, so the primary's within-year order survives)
+        # puts every item under its year heading
+        for output_list in outputs.values():
+            output_list.sort(key=self._item_year, reverse=True)
+
         return outputs
+
+    @staticmethod
+    def _item_year(item):
+        """
+        The publication year an item sorts under
+        :param item: an internal-format publication record
+        :return: the year as an integer, 0 when the item has no usable date
+        """
+        try:
+            return int(str(item.get("date", ""))[:4])
+        except ValueError:
+            return 0
 
     def _filter_by_book_review(self, item, potential_types):
         """
